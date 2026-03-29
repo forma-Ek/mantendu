@@ -32,7 +32,12 @@ echo  [OK] Ficheros encontrados.
 echo  [..] Copiando ficheros a %WORKDIR%...
 if not exist "%WORKDIR%" mkdir "%WORKDIR%"
 copy /Y "%SCRIPT_DIR%server.ps1" "%WORKDIR%\server.ps1" >nul 2>&1
-copy /Y "%SCRIPT_DIR%index.html" "%WORKDIR%\index.html" >nul 2>&1
+:: Si existe app.html (repo), usarlo. Si no, usar index.html (ZIP descargado)
+if exist "%SCRIPT_DIR%app.html" (
+    copy /Y "%SCRIPT_DIR%app.html" "%WORKDIR%\index.html" >nul 2>&1
+) else (
+    copy /Y "%SCRIPT_DIR%index.html" "%WORKDIR%\index.html" >nul 2>&1
+)
 
 if not exist "%WORKDIR%\server.ps1" (
     echo  [ERROR] Copia fallida. Ejecuta como Administrador.
