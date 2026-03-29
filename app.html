@@ -5405,12 +5405,12 @@ function dcRenderBrowserList(data) {
     return;
   }
   list.innerHTML = data.items.map(item => {
-    const icon    = item.type === 'folder' ? '📁' : '📄';
+    const icon    = item.Type === 'folder' ? '📁' : '📄';
     const isSel   = DC.selected.has(item.FullPath);
-    const sizeStr = item.type === 'file' ? `<span style="color:var(--txt3);font-size:.72rem;margin-left:auto">${item.SizeDisplay}</span>` : '';
+    const sizeStr = item.Type === 'file' ? `<span style="color:var(--txt3);font-size:.72rem;margin-left:auto">${item.SizeDisplay}</span>` : '';
     return `<div class="dc-browser-row ${isSel?'selected':''}">
-      <input type="checkbox" ${isSel?'checked':''} onclick="dcToggleSelect(event,'${jsStr(item.FullPath)}','${jsStr(item.Name)}','${item.type}','${jsStr(item.SizeDisplay||'')}')">
-      <span style="cursor:pointer;flex:1;display:flex;align-items:center;gap:6px" onclick="${item.type==='folder'?`dcBrowseTo('${jsStr(item.FullPath)}')`:''}">
+      <input type="checkbox" ${isSel?'checked':''} onclick="dcToggleSelect(event,'${jsStr(item.FullPath)}','${jsStr(item.Name)}','${item.Type}','${jsStr(item.SizeDisplay||'')}')">
+      <span style="cursor:pointer;flex:1;display:flex;align-items:center;gap:6px" onclick="${item.Type==='folder'?`dcBrowseTo('${jsStr(item.FullPath)}')`:''}">
         ${icon} <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(item.Name)}</span>
       </span>
       ${sizeStr}
