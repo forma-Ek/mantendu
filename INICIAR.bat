@@ -32,9 +32,9 @@ echo  [OK] Ficheros encontrados.
 echo  [..] Copiando ficheros a %WORKDIR%...
 if not exist "%WORKDIR%" mkdir "%WORKDIR%"
 copy /Y "%SCRIPT_DIR%server.ps1" "%WORKDIR%\server.ps1" >nul 2>&1
-copy /Y "%SCRIPT_DIR%index.html" "%WORKDIR%\index.html" >nul 2>&1
+copy /Y "%SCRIPT_DIR%app.html" "%WORKDIR%\index.html" >nul 2>&1
 
-if not exist "%WORKDIR%\server.ps1" (
+if not exist "%WORKDIR%\server.ps1" || not exist "%WORKDIR%\index.html" (
     echo  [ERROR] Copia fallida. Ejecuta como Administrador.
     echo [%date% %time%] ERROR: copia fallida >> "%LOGFILE%"
     pause & exit /b 1
@@ -44,7 +44,7 @@ echo [%date% %time%] OK: ficheros copiados >> "%LOGFILE%"
 
 :: Desbloquear Zone Identifier
 powershell -Command "Unblock-File -Path '%WORKDIR%\server.ps1' -ErrorAction SilentlyContinue" >nul 2>&1
-powershell -Command "Unblock-File -Path '%WORKDIR%\index.html' -ErrorAction SilentlyContinue" >nul 2>&1
+powershell -Command "Unblock-File -Path '%WORKDIR%\app.html' -ErrorAction SilentlyContinue" >nul 2>&1
 echo  [OK] Ficheros desbloqueados.
 echo [%date% %time%] OK: Unblock-File ejecutado >> "%LOGFILE%"
 
