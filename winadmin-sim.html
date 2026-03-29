@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WinAdmin Tool — Simulación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#070a0f; --surface:#0c1118; --card:#111827; --card2:#141e2d;
+  --hover:#1a2840; --border:#1c2d3d; --border2:#2a4060;
+  --accent:#00e5ff; --accent2:#00b8cc; --accent-glow:rgba(0,229,255,.12);
+  --green:#00e676; --amber:#ffb300; --red:#ff4444; --purple:#a855f7;
+  --txt:#dde8f4; --txt2:#7a9ab8; --txt3:#3d5a72;
+  --font-head:'Exo 2',sans-serif; --font-mono:'Share Tech Mono',monospace;
+  --sidebar-w:230px; --radius:6px; --shadow:0 4px 24px rgba(0,0,0,.5);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--font-head);display:flex;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent2)}
+
+/* DEMO BANNER */
+.demo-banner{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  background:linear-gradient(90deg,rgba(255,179,0,.15),rgba(255,179,0,.08));
+  border-bottom:1px solid rgba(255,179,0,.3);
+  padding:6px 16px;font-size:.75rem;color:var(--amber);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  font-family:var(--font-mono);
+}
+body{padding-top:32px}
+#sidebar{top:32px}
+
+/* SIDEBAR */
+#sidebar{
+  width:var(--sidebar-w);min-height:100vh;background:var(--surface);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+  position:fixed;left:0;bottom:0;z-index:100;
+  background-image:
+    radial-gradient(ellipse at 50% 0%,rgba(0,229,255,.05) 0%,transparent 60%),
+    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,229,255,.03) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,229,255,.03) 40px);
+}
+.logo{padding:22px 18px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(0,229,255,.3);flex-shrink:0}
+.logo-text{font-size:1.1rem;font-weight:800;letter-spacing:.05em;color:var(--txt);line-height:1.1}
+.logo-sub{font-size:.65rem;color:var(--txt3);letter-spacing:.1em;text-transform:uppercase;font-weight:400}
+.nav{padding:12px 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:11px;padding:11px 18px;cursor:pointer;color:var(--txt2);font-size:.9rem;font-weight:500;letter-spacing:.03em;border-left:2px solid transparent;transition:all .2s;user-select:none}
+.nav-item:hover{background:var(--hover);color:var(--txt)}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-glow)}
+.nav-icon{font-size:1.1rem;width:22px;text-align:center;flex-shrink:0}
+.sidebar-footer{padding:14px 18px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.lang-toggle{display:flex;background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;width:100%}
+.lang-btn{flex:1;padding:7px 4px;background:none;border:none;cursor:pointer;font-family:var(--font-head);font-size:.8rem;font-weight:600;color:var(--txt2);letter-spacing:.05em;transition:all .2s}
+.lang-btn.active{background:var(--accent);color:#000}
+.lang-btn:hover:not(.active){background:var(--hover);color:var(--txt)}
+.server-status{display:flex;align-items:center;gap:7px;font-size:.7rem;color:var(--txt3);font-family:var(--font-mono)}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* MAIN */
+#main{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
+.section{display:none;flex:1;flex-direction:column;animation:fadeIn .25s ease}
+.section.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.section-header{padding:24px 28px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;position:sticky;top:32px;z-index:10}
+.section-title{font-size:1.4rem;font-weight:700;display:flex;align-items:center;gap:10px;letter-spacing:.03em}
+.section-title-icon{width:36px;height:36px;border-radius:8px;background:var(--accent-glow);border:1px solid var(--accent2);display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.section-desc{font-size:.8rem;color:var(--txt2);margin-top:3px;font-weight:400}
+.section-body{padding:24px 28px;flex:1}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border:none;border-radius:var(--radius);font-family:var(--font-head);font-size:.85rem;font-weight:600;cursor:pointer;letter-spacing:.04em;transition:all .18s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:#33ebff;box-shadow:0 0 18px rgba(0,229,255,.4)}
+.btn-secondary{background:var(--card2);color:var(--txt);border:1px solid var(--border2)}
+.btn-secondary:hover{background:var(--hover);border-color:var(--accent2)}
+.btn-danger{background:rgba(255,68,68,.15);color:var(--red);border:1px solid rgba(255,68,68,.3)}
+.btn-danger:hover{background:rgba(255,68,68,.25)}
+.btn-success{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.3)}
+.btn-success:hover{background:rgba(0,230,118,.22)}
+.btn-sm{padding:6px 13px;font-size:.8rem}
+.btn-xs{padding:4px 9px;font-size:.75rem}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 8px;border-radius:3px;font-size:.7rem;font-weight:600;letter-spacing:.05em;font-family:var(--font-head)}
+.badge-green{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.badge-amber{background:rgba(255,179,0,.12);color:var(--amber);border:1px solid rgba(255,179,0,.25)}
+.badge-red{background:rgba(255,68,68,.12);color:var(--red);border:1px solid rgba(255,68,68,.25)}
+.badge-blue{background:rgba(0,229,255,.1);color:var(--accent);border:1px solid rgba(0,229,255,.25)}
+.badge-gray{background:var(--card2);color:var(--txt2);border:1px solid var(--border2)}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead th{background:var(--card2);padding:10px 14px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);font-weight:600;font-family:var(--font-head);border-bottom:1px solid var(--border2);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--hover)}
+tbody tr.selected-row{background:rgba(0,229,255,.06);border-left:2px solid var(--accent)}
+td{padding:10px 14px;vertical-align:middle}
+.mono{font-family:var(--font-mono);font-size:.8rem}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.stat-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);margin-bottom:4px;font-weight:600}
+.stat-value{font-size:1.3rem;font-weight:700;font-family:var(--font-mono);color:var(--txt)}
+.stat-sub{font-size:.72rem;color:var(--txt3);margin-top:2px}
+
+/* SIZE BAR */
+.size-bar-wrap{display:flex;align-items:center;gap:8px;min-width:0}
+.size-bar{height:5px;border-radius:3px;background:var(--border);flex:1;min-width:60px;overflow:hidden}
+.size-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .4s ease}
+.size-bar-fill.warn{background:linear-gradient(90deg,#cc8800,var(--amber))}
+.size-bar-fill.danger{background:linear-gradient(90deg,#cc2222,var(--red))}
+.size-val{font-family:var(--font-mono);font-size:.78rem;color:var(--txt2);white-space:nowrap;min-width:65px;text-align:right}
+
+/* DRIVES */
+.drives-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.drive-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.drive-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent2),var(--accent));opacity:0;transition:opacity .2s}
+.drive-card:hover:not(.locked){border-color:var(--accent2);background:var(--card2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.drive-card:hover:not(.locked)::before{opacity:1}
+.drive-card.locked{cursor:not-allowed;opacity:.7}
+.drive-card.selected-drive{border-color:var(--accent);background:rgba(0,229,255,.06)}
+.drive-card.selected-drive::before{opacity:1}
+.drive-letter{font-size:2rem;font-weight:800;color:var(--accent);font-family:var(--font-mono);line-height:1;margin-bottom:2px}
+.drive-label{font-size:.8rem;color:var(--txt2);margin-bottom:12px;font-weight:500}
+.drive-usage-bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden;margin-bottom:6px}
+.drive-usage-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.drive-meta{display:flex;justify-content:space-between;font-size:.72rem;font-family:var(--font-mono);color:var(--txt3)}
+
+/* FORMS */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:.78rem;font-weight:600;color:var(--txt2);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.form-input,.form-select{width:100%;padding:10px 13px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--txt);font-family:var(--font-head);font-size:.88rem;transition:border-color .2s;outline:none}
+.form-input:focus,.form-select:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,229,255,.1)}
+.form-select option{background:var(--card2)}
+
+/* LOADING */
+.spinner{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);border-top-color:var(--accent);animation:spin .7s linear infinite;display:inline-block;flex-shrink:0}
+.spinner-sm{width:16px;height:16px;border-width:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-state{display:flex;align-items:center;justify-content:center;gap:14px;padding:48px;color:var(--txt2);font-size:.9rem}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:60px;color:var(--txt3)}
+.empty-state .empty-icon{font-size:2.5rem;opacity:.4}
+
+/* FOLDERS PANEL */
+.folders-panel{margin-top:16px;padding:18px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--radius);animation:fadeIn .2s ease}
+.folders-panel-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* EXPLORER */
+.explorer-panel{margin-top:16px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--radius);animation:fadeIn .2s ease;overflow:hidden}
+.explorer-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.explorer-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;display:flex;align-items:center;gap:8px}
+.breadcrumb{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-family:var(--font-mono);font-size:.75rem;color:var(--txt2);margin-top:6px}
+.breadcrumb-sep{color:var(--txt3)}
+.breadcrumb-part{cursor:pointer;color:var(--accent2);padding:2px 4px;border-radius:3px;transition:background .15s}
+.breadcrumb-part:hover{background:var(--hover);color:var(--accent)}
+.breadcrumb-current{color:var(--txt);cursor:default}
+.explorer-toolbar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
+.explorer-stats{font-size:.75rem;color:var(--txt3);font-family:var(--font-mono);margin-left:auto}
+.explorer-body{max-height:380px;overflow-y:auto}
+.explorer-row{display:grid;grid-template-columns:32px 1fr 90px 130px;align-items:center;padding:9px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;font-size:.84rem}
+.explorer-row:last-child{border-bottom:none}
+.explorer-row:hover{background:var(--hover)}
+.explorer-row.selected-file{background:rgba(0,229,255,.06);border-left:2px solid var(--accent)}
+.explorer-row.is-folder{color:var(--accent2)}
+.explorer-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:8px}
+.explorer-size{font-family:var(--font-mono);font-size:.76rem;color:var(--txt2);text-align:right;padding-right:12px}
+.explorer-date{font-family:var(--font-mono);font-size:.73rem;color:var(--txt3)}
+.explorer-th{display:grid;grid-template-columns:32px 1fr 90px 130px;padding:7px 16px;background:var(--card2);border-bottom:1px solid var(--border2);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);font-weight:600}
+.explorer-empty{padding:40px;text-align:center;color:var(--txt3);font-size:.85rem}
+
+/* CLEANUP */
+.cleanup-layout{display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:start}
+@media(max-width:700px){.cleanup-layout{grid-template-columns:1fr}}
+.cleanup-categories{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:sticky;top:80px}
+.cleanup-cat-item{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;font-size:.85rem;font-weight:600;border-left:2px solid transparent;border-bottom:1px solid var(--border);transition:all .15s;user-select:none}
+.cleanup-cat-item:last-child{border-bottom:none}
+.cleanup-cat-item:hover{background:var(--hover)}
+.cleanup-cat-item.active{background:var(--accent-glow);border-left-color:var(--accent);color:var(--accent)}
+.cleanup-cat-icon{font-size:1.1rem;width:22px;text-align:center}
+.cleanup-cat-count{margin-left:auto;font-size:.7rem;font-family:var(--font-mono);background:var(--border2);color:var(--txt3);padding:2px 6px;border-radius:3px}
+.cleanup-cat-item.active .cleanup-cat-count{background:rgba(0,229,255,.15);color:var(--accent)}
+.cleanup-items-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.cleanup-panel-header{padding:12px 16px;background:var(--card2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.cleanup-panel-title{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.cleanup-check-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);transition:background .12s;cursor:pointer}
+.cleanup-check-row:last-child{border-bottom:none}
+.cleanup-check-row:hover{background:var(--hover)}
+.cleanup-check-row.checked{background:rgba(0,229,255,.04)}
+.cleanup-check-row input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);flex-shrink:0;cursor:pointer}
+.cleanup-row-info{flex:1;min-width:0}
+.cleanup-row-name{font-size:.85rem;font-weight:500}
+.cleanup-row-path{font-size:.72rem;color:var(--txt3);font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px}
+.cleanup-row-size{font-family:var(--font-mono);font-size:.8rem;color:var(--accent);white-space:nowrap;min-width:70px;text-align:right}
+.cleanup-row-admin{flex-shrink:0}
+.cleanup-footer{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border2);padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;z-index:5}
+.cleanup-footer-stats{display:flex;gap:16px;flex:1;flex-wrap:wrap}
+.cleanup-footer-stat{display:flex;flex-direction:column}
+.cleanup-footer-stat-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);font-weight:600}
+.cleanup-footer-stat-value{font-size:1.1rem;font-weight:700;font-family:var(--font-mono)}
+
+/* PST */
+.pst-controls{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px}
+.pst-controls .form-group{margin-bottom:0;min-width:160px}
+.copy-bar{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;padding:16px;background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);margin-top:16px}
+.copy-bar .form-group{margin-bottom:0;flex:1;min-width:200px}
+.modal-warning{background:rgba(255,179,0,.08);border:1px solid rgba(255,179,0,.25);border-radius:var(--radius);padding:10px 14px;font-size:.8rem;color:var(--amber);margin-bottom:16px;display:flex;align-items:flex-start;gap:8px}
+
+/* LOCAL USERS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+
+/* MODAL */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center}
+#modal-overlay.visible{display:flex}
+.modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:28px;max-width:500px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.7);animation:modalIn .2s ease;max-height:90vh;overflow-y:auto}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(-10px)}to{opacity:1;transform:none}}
+.modal-icon{font-size:2rem;margin-bottom:12px}
+.modal-title{font-size:1.15rem;font-weight:700;margin-bottom:8px}
+.modal-desc{font-size:.88rem;color:var(--txt2);line-height:1.5;margin-bottom:20px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+
+/* TOASTS */
+#toast-container{position:fixed;bottom:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:12px 18px;border-radius:var(--radius);font-size:.85rem;font-weight:500;display:flex;align-items:center;gap:10px;animation:toastIn .25s ease;pointer-events:all;max-width:340px;box-shadow:var(--shadow)}
+.toast.success{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);color:var(--green)}
+.toast.error{background:rgba(255,68,68,.12);border:1px solid rgba(255,68,68,.3);color:var(--red)}
+.toast.info{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.25);color:var(--accent)}
+.toast.warn{background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.25);color:var(--amber)}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+/* Net */
+.net-adapters-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:24px}
+.net-adapter-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.net-adapter-card.connected{border-top:2px solid var(--green)}
+.net-adapter-card.disconnected{border-top:2px solid var(--txt3);opacity:.65}
+.net-adapter-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card2);border-bottom:1px solid var(--border);gap:10px}
+.net-adapter-name{font-size:.95rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.net-adapter-desc{font-size:.72rem;color:var(--txt3);margin-top:2px}
+.net-adapter-body{padding:14px 16px}
+.net-field{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.84rem}
+.net-field:last-child{border-bottom:none}
+.net-field-label{width:90px;flex-shrink:0;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);font-weight:600;padding-top:1px}
+.net-field-value{font-family:var(--font-mono);font-size:.82rem;color:var(--txt2);word-break:break-all;flex:1}
+.net-field-value.highlight{color:var(--txt);font-weight:600}
+.net-adapter-actions{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;background:var(--surface);border-top:1px solid var(--border)}
+.ping-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.ping-header{padding:12px 16px;background:var(--card2);border-bottom:1px solid var(--border);font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;display:flex;align-items:center;gap:8px}
+.ping-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--border)}
+.ping-input{flex:1;min-width:180px;padding:9px 13px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--txt);font-family:var(--font-mono);font-size:.88rem;outline:none}
+.ping-input:focus{border-color:var(--accent)}
+.ping-row{display:flex;align-items:center;gap:12px;padding:9px 16px;border-bottom:1px solid var(--border);font-size:.83rem;font-family:var(--font-mono);animation:fadeIn .2s ease}
+.ping-row:last-child{border-bottom:none}
+.ping-seq{color:var(--txt3);width:30px;flex-shrink:0}
+.ping-host{color:var(--txt2);flex:1}
+.ping-ms{font-weight:700;min-width:60px;text-align:right}
+.ping-ms.fast{color:var(--green)}.ping-ms.ok{color:var(--accent)}.ping-ms.slow{color:var(--amber)}.ping-ms.timeout{color:var(--red)}
+.ping-status{font-size:.75rem;color:var(--txt3);min-width:60px;text-align:right}
+.ping-summary{padding:12px 16px;background:var(--card2);border-top:1px solid var(--border2);display:flex;gap:20px;flex-wrap:wrap;font-size:.78rem;font-family:var(--font-mono)}
+.ping-summary-item{display:flex;flex-direction:column;gap:2px}
+.ping-summary-label{color:var(--txt3);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em}
+.ping-summary-val{font-weight:700;font-size:.9rem}
+.net-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);align-items:center}
+.net-toolbar-label{font-size:.75rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-right:4px}
+/* Perf */
+.perf-grid-top{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+@media(max-width:860px){.perf-grid-top{grid-template-columns:1fr}}
+.perf-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
+.perf-card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--card2);border-bottom:1px solid var(--border)}
+.perf-card-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:8px}
+.perf-card-value{font-family:var(--font-mono);font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1}
+.perf-card-sub{font-size:.7rem;color:var(--txt3);font-family:var(--font-mono);margin-top:2px;text-align:right}
+.perf-gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:16px 16px 8px}
+.perf-chart-wrap{padding:0 12px 12px;flex:1;min-height:100px}
+.perf-canvas{width:100%;height:90px;display:block}
+.ram-bar-section{padding:12px 16px}
+.ram-segments{display:flex;height:18px;border-radius:4px;overflow:hidden;margin-bottom:8px;background:var(--border)}
+.ram-seg{height:100%;transition:width .4s ease}
+.ram-legend{display:flex;gap:14px;flex-wrap:wrap}
+.ram-legend-item{display:flex;align-items:center;gap:6px;font-size:.72rem;font-family:var(--font-mono);color:var(--txt2)}
+.ram-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.perf-procs{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.perf-procs-header{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:var(--card2);border-bottom:1px solid var(--border);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3)}
+.perf-proc-row{display:grid;grid-template-columns:1fr 80px 90px 90px 90px;padding:9px 16px;border-bottom:1px solid var(--border);font-size:.82rem;align-items:center;transition:background .12s}
+.perf-proc-row:last-child{border-bottom:none}
+.perf-proc-row:hover{background:var(--hover)}
+.perf-proc-row.header-row{background:var(--card2);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);font-weight:600;border-bottom:1px solid var(--border2)}
+.perf-proc-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:8px;font-weight:500}
+.perf-proc-val{font-family:var(--font-mono);font-size:.78rem;text-align:right;padding-right:8px}
+.perf-proc-bar-cell{padding-right:12px}
+.perf-proc-bar{height:4px;border-radius:2px;background:var(--border);overflow:hidden}
+.perf-proc-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.perf-live{display:flex;align-items:center;gap:6px;font-size:.68rem;font-family:var(--font-mono);color:var(--txt3)}
+.perf-live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 1.5s infinite}
+.perf-live-dot.paused{background:var(--amber);box-shadow:0 0 6px var(--amber);animation:none}
+.disk-io-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:20px}
+.disk-io-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.disk-io-name{font-size:.85rem;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.disk-io-row{display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:6px}
+.disk-io-label{color:var(--txt3);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.disk-io-val{font-family:var(--font-mono);font-size:.82rem;font-weight:700}
+.disk-io-val.read{color:var(--accent)}.disk-io-val.write{color:var(--amber)}
+/* Servicios */
+.svc-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px}
+.svc-search{flex:1;min-width:180px;padding:9px 13px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--txt);font-family:var(--font-mono);font-size:.85rem;outline:none;transition:border-color .2s}
+.svc-search:focus{border-color:var(--accent)}
+.svc-filter-group{display:flex;gap:6px;flex-wrap:wrap}
+.svc-filter-btn{padding:6px 14px;border-radius:var(--radius);background:var(--card2);border:1px solid var(--border2);color:var(--txt3);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s}
+.svc-filter-btn.active{background:rgba(0,229,255,.12);border-color:var(--accent);color:var(--accent)}
+.svc-stats{font-size:.75rem;font-family:var(--font-mono);color:var(--txt3);display:flex;gap:12px;flex-wrap:wrap;padding:0 2px}
+.svc-stats-item{display:flex;align-items:center;gap:5px}
+.svc-stats-dot{width:7px;height:7px;border-radius:50%}
+.svc-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.svc-table-scroll{overflow-x:auto;overflow-y:auto;max-height:calc(100vh - 320px)}
+.svc-table{width:100%;border-collapse:collapse;min-width:680px}
+.svc-table th{position:sticky;top:0;z-index:2;padding:10px 14px;background:var(--card2);border-bottom:1px solid var(--border2);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);text-align:left;white-space:nowrap;cursor:pointer;user-select:none}
+.svc-table th:hover{color:var(--txt)}
+.svc-table th .sort-icon{margin-left:4px;opacity:.4}
+.svc-table th.sorted .sort-icon{opacity:1;color:var(--accent)}
+.svc-table td{padding:9px 14px;border-bottom:1px solid var(--border);font-size:.82rem;vertical-align:middle}
+.svc-table tr:last-child td{border-bottom:none}
+.svc-table tr:hover td{background:var(--hover)}
+.svc-status{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:700;white-space:nowrap}
+.svc-status.running{background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.25);color:var(--green)}
+.svc-status.stopped{background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.2);color:var(--red)}
+.svc-status.paused{background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.25);color:var(--amber)}
+.svc-status.other{background:rgba(255,255,255,.06);border:1px solid var(--border2);color:var(--txt3)}
+.svc-start{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.68rem;font-weight:600;background:var(--card2);border:1px solid var(--border2);color:var(--txt3);white-space:nowrap}
+.svc-start.auto{color:var(--accent);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.06)}
+.svc-start.manual{color:var(--amber);border-color:rgba(255,179,0,.3);background:rgba(255,179,0,.06)}
+.svc-start.disabled{opacity:.6}
+.svc-name{font-weight:600;color:var(--txt);white-space:nowrap}
+.svc-desc{font-size:.72rem;color:var(--txt3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+.svc-actions{display:flex;gap:5px;flex-wrap:nowrap}
+.svc-btn{padding:4px 10px;font-size:.72rem;font-weight:600;border-radius:4px;cursor:pointer;border:1px solid;transition:all .12s;white-space:nowrap}
+.svc-btn-start{color:var(--green);border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.08)}
+.svc-btn-start:hover{background:rgba(0,230,118,.18)}
+.svc-btn-stop{color:var(--red);border-color:rgba(255,68,68,.3);background:rgba(255,68,68,.08)}
+.svc-btn-stop:hover{background:rgba(255,68,68,.18)}
+.svc-btn-restart{color:var(--amber);border-color:rgba(255,179,0,.3);background:rgba(255,179,0,.08)}
+.svc-btn-restart:hover{background:rgba(255,179,0,.18)}
+.svc-btn:disabled{opacity:.35;cursor:not-allowed}
+.svc-start-select{padding:4px 8px;background:var(--card2);border:1px solid var(--border2);border-radius:4px;color:var(--txt2);font-size:.75rem;outline:none;cursor:pointer}
+.svc-start-select:focus{border-color:var(--accent)}
+.svc-empty-row td{text-align:center;padding:40px;color:var(--txt3)}
+</style>
+</head>
+<body>
+
+<div class="demo-banner">
+  ⚠️ MODO SIMULACIÓN — Datos ficticios · Sin conexión al servidor PowerShell · Solo interfaz
+</div>
+
+<nav id="sidebar">
+  <div class="logo">
+    <div class="logo-icon">⚙️</div>
+    <div><div class="logo-text">WinAdmin</div><div class="logo-sub">Tool v1.0</div></div>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" data-section="users" onclick="navigate('users')"><span class="nav-icon">👤</span><span>Gestión de Usuarios</span></div>
+    <div class="nav-item" data-section="format" onclick="navigate('format')"><span class="nav-icon">💾</span><span>Formateo de Unidad</span></div>
+    <div class="nav-item" data-section="cleanup" onclick="navigate('cleanup')"><span class="nav-icon">🧹</span><span>Limpieza Personalizada</span></div>
+    <div class="nav-item" data-section="pst" onclick="navigate('pst')"><span class="nav-icon">📧</span><span>Búsqueda .pst</span></div>
+    <div class="nav-item" data-section="network" onclick="navigate('network')"><span class="nav-icon">🌐</span><span>Red</span></div>
+    <div class="nav-item" data-section="perf" onclick="navigate('perf')"><span class="nav-icon">📊</span><span>Monitor</span></div>
+    <div class="nav-item" data-section="svc" onclick="navigate('svc')"><span class="nav-icon">🔧</span><span>Servicios</span></div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="server-status"><div class="status-dot"></div><span>Simulación activa</span></div>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="langES" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" id="langEU" onclick="setLang('eu')">EU</button>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ══ USUARIOS ══ -->
+<section id="section-users" class="section active">
+  <div class="section-header">
+    <div>
+      <div class="section-title"><div class="section-title-icon">👤</div><span>Gestión de Usuarios</span></div>
+      <div class="section-desc">Usuarios de C:\Users ordenados por último acceso</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" id="tab-c-users" onclick="switchUsersTab('catalog')" style="border-bottom:2px solid var(--accent)">👤 Gestión de Usuarios</button>
+      <button class="btn btn-secondary btn-sm" id="tab-local-users" onclick="switchUsersTab('local')">🔑 Usuarios Locales</button>
+      <button class="btn btn-secondary btn-sm" onclick="refreshCurrentUsersTab()">🔄 Actualizar</button>
+    </div>
+  </div>
+  <div class="section-body">
+    <div id="users-stats" class="stats-row" style="display:none">
+      <div class="stat-card"><div class="stat-label">Usuarios</div><div class="stat-value" id="stat-users">—</div></div>
+      <div class="stat-card"><div class="stat-label">Tamaño total</div><div class="stat-value" id="stat-totalsize">—</div><div class="stat-sub">calculado</div></div>
+      <div class="stat-card"><div class="stat-label">Más grande</div><div class="stat-value" id="stat-largest">—</div></div>
+    </div>
+    <div id="users-loading" class="loading-state"><div class="spinner"></div><span>Cargando usuarios...</span></div>
+    <div id="users-empty" class="empty-state" style="display:none"><div class="empty-icon">👤</div><p>No se encontraron usuarios</p></div>
+    <div id="users-table-wrap" style="display:none">
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Usuario</th><th>Último acceso</th><th>Tamaño</th><th>Acciones</th></tr></thead>
+        <tbody id="users-tbody"></tbody></table>
+      </div>
+      <div id="folders-panel-container"></div>
+      <div id="explorer-container"></div>
+    </div>
+    <div id="local-users-panel" style="display:none;padding:0 0 24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:.85rem;color:var(--txt2)">Crear, eliminar y gestionar usuarios locales de Windows</div>
+        <button class="btn btn-primary btn-sm" onclick="openCreateUserModal()">➕ + Nuevo usuario</button>
+      </div>
+      <div id="local-users-loading" class="loading-state"><div class="spinner"></div><span>Cargando...</span></div>
+      <div id="local-users-table-wrap" style="display:none">
+        <div class="tbl-wrap">
+          <table><thead><tr><th>Usuario</th><th>Estado</th><th>Grupos</th><th>Último inicio</th><th>Acciones</th></tr></thead>
+          <tbody id="local-users-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FORMATEO ══ -->
+<section id="section-format" class="section">
+  <div class="section-header">
+    <div><div class="section-title"><div class="section-title-icon">💾</div><span>Formateo de Unidad</span></div><div class="section-desc">Selecciona la unidad que deseas formatear</div></div>
+    <button class="btn btn-secondary btn-sm" onclick="loadDrives()">🔄 Actualizar</button>
+  </div>
+  <div class="section-body">
+    <div class="modal-warning">⚠️ Las unidades con 🔒 son del sistema y no pueden formatearse. El formateo es irreversible.</div>
+    <div id="drives-loading" class="loading-state"><div class="spinner"></div><span>Cargando unidades...</span></div>
+    <div id="drives-grid" class="drives-grid" style="display:none"></div>
+    <div id="format-panel" style="display:none;margin-top:22px;padding:22px;background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);border-top:2px solid var(--amber)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div style="font-size:1rem;font-weight:700;color:var(--amber)">⚠️ Configurar formateo — <span id="format-drive-label" style="font-family:var(--font-mono);color:var(--txt)"></span></div>
+        <button class="btn btn-secondary btn-xs" onclick="closeFormatPanel()">Cancelar</button>
+      </div>
+      <div style="font-size:.88rem;color:var(--txt2);margin-bottom:18px;line-height:1.6">Se abrirá el diálogo de formateo nativo de Windows con la unidad preseleccionada.</div>
+      <button class="btn btn-secondary" onclick="toast('(Simulación) Abriría el diálogo de formateo de Windows','info')">💾 Abrir diálogo de Windows</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ LIMPIEZA ══ -->
+<section id="section-cleanup" class="section">
+  <div class="section-header">
+    <div><div class="section-title"><div class="section-title-icon">🧹</div><span>Limpieza Personalizada</span></div><div class="section-desc">Selecciona los elementos a limpiar y revisa el espacio que se liberará</div></div>
+    <button class="btn btn-secondary btn-sm" onclick="loadCleanup()">🔄 Recalcular</button>
+  </div>
+  <div class="section-body">
+    <div id="cleanup-loading" class="loading-state"><div class="spinner"></div><span>Calculando tamaños...</span></div>
+    <div id="cleanup-content" style="display:none">
+      <div class="cleanup-layout">
+        <div><div class="cleanup-categories" id="cleanup-cat-list"></div></div>
+        <div>
+          <div class="cleanup-items-panel">
+            <div class="cleanup-panel-header">
+              <div class="cleanup-panel-title" id="cleanup-panel-title">—</div>
+              <label style="font-size:.78rem;color:var(--txt2);cursor:pointer;display:flex;align-items:center;gap:7px">
+                <input type="checkbox" id="cleanup-select-all" onchange="toggleAllCleanupCat(this.checked)" style="width:14px;height:14px;accent-color:var(--accent)">
+                Sel. todo
+              </label>
+            </div>
+            <div id="cleanup-list"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cleanup-footer">
+        <div class="cleanup-footer-stats">
+          <div class="cleanup-footer-stat"><span class="cleanup-footer-stat-label">Seleccionados</span><span class="cleanup-footer-stat-value" id="cleanup-selected-count">0</span></div>
+          <div class="cleanup-footer-stat"><span class="cleanup-footer-stat-label">A liberar</span><span class="cleanup-footer-stat-value" id="cleanup-selected-size" style="color:var(--green)">0 B</span></div>
+          <div class="cleanup-footer-stat"><span class="cleanup-footer-stat-label">Total disponible</span><span class="cleanup-footer-stat-value" id="cleanup-total-size">—</span></div>
+        </div>
+        <button class="btn btn-success" id="cleanup-execute-btn" onclick="executeCleanup()" disabled>🧹 Limpiar seleccionados</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PST ══ -->
+<section id="section-pst" class="section">
+  <div class="section-header">
+    <div><div class="section-title"><div class="section-title-icon">📧</div><span>Búsqueda de archivos .pst</span></div><div class="section-desc">Localiza archivos PST de Outlook en cualquier unidad</div></div>
+  </div>
+  <div class="section-body">
+    <div class="card" style="margin-bottom:20px">
+      <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.12em;color:var(--txt3);margin-bottom:10px;font-weight:600">Configurar búsqueda</div>
+      <div class="pst-controls">
+        <div class="form-group">
+          <label class="form-label">Unidad a analizar</label>
+          <select class="form-select" id="pst-drive-select" style="min-width:160px">
+            <option value="C">C: Sistema (476 GB)</option>
+            <option value="D">D: Datos (931 GB)</option>
+            <option value="E">E: Backup (1.8 TB)</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="pst-scan-btn" onclick="scanPst()">🔍 Buscar archivos .pst</button>
+      </div>
+      <div style="font-size:.78rem;color:var(--txt3)">⏱️ La búsqueda puede tardar varios minutos en unidades grandes.</div>
+    </div>
+    <div id="pst-loading" class="loading-state" style="display:none"><div class="spinner"></div><span>Buscando archivos .pst...</span></div>
+    <div id="pst-results" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:.88rem;font-weight:600"><span id="pst-count">0</span> archivos encontrados</div>
+        <label style="font-size:.78rem;color:var(--txt2);cursor:pointer;display:flex;align-items:center;gap:7px">
+          <input type="checkbox" id="pst-select-all" onchange="toggleAllPst(this.checked)" style="accent-color:var(--accent)">Seleccionar todo
+        </label>
+      </div>
+      <div id="pst-empty" class="empty-state" style="display:none"><div class="empty-icon">📭</div><p>No se encontraron archivos .pst</p></div>
+      <div id="pst-table-wrap" class="tbl-wrap" style="display:none">
+        <table><thead><tr><th style="width:36px"></th><th>Archivo</th><th>Ruta</th><th>Tamaño</th><th>Última modificación</th></tr></thead>
+        <tbody id="pst-tbody"></tbody></table>
+      </div>
+      <div class="copy-bar" id="pst-copy-bar" style="display:none">
+        <div class="form-group"><label class="form-label">Carpeta destino</label><input type="text" class="form-input" id="pst-dest" placeholder="Ej: D:\Backup\PST"></div>
+        <button class="btn btn-success" id="pst-copy-btn" onclick="copyPst()">📋 Copiar seleccionados</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RED ══ -->
+<section id="section-network" class="section">
+  <div class="section-header">
+    <div><div class="section-title"><div class="section-title-icon">🌐</div><span>Red</span></div><div class="section-desc">Adaptadores de red, IP, DNS y herramientas de diagnóstico</div></div>
+    <button class="btn btn-secondary btn-sm" onclick="loadNetwork()">🔄 Actualizar</button>
+  </div>
+  <div class="section-body">
+    <div class="net-toolbar">
+      <span class="net-toolbar-label">Acciones globales:</span>
+      <button class="btn btn-secondary btn-sm" onclick="flushDns()">🧹 Vaciar caché DNS</button>
+    </div>
+    <div id="net-loading" class="loading-state"><div class="spinner"></div><span>Cargando adaptadores...</span></div>
+    <div id="net-adapters-grid" class="net-adapters-grid" style="display:none"></div>
+    <div class="ping-panel" id="ping-panel" style="display:none">
+      <div class="ping-header">🔍 Test de conectividad (Ping)</div>
+      <div class="ping-controls">
+        <input type="text" class="ping-input" id="ping-host" placeholder="Ej: 8.8.8.8 o google.com" onkeydown="if(event.key==='Enter')doPing()">
+        <select class="form-select" id="ping-count" style="padding:9px 10px;min-width:100px">
+          <option value="4">4 pings</option><option value="8">8 pings</option><option value="16">16 pings</option>
+        </select>
+        <button class="btn btn-primary btn-sm" id="ping-btn" onclick="doPing()">▶ Ping</button>
+        <button class="btn btn-secondary btn-sm" onclick="clearPing()">✕ Limpiar</button>
+      </div>
+      <div id="ping-results-wrap" style="display:none">
+        <div id="ping-results-body" class="ping-results"></div>
+        <div class="ping-summary" id="ping-summary"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ MONITOR ══ -->
+<section id="section-perf" class="section">
+  <div class="section-header">
+    <div><div class="section-title"><div class="section-title-icon">📊</div><span>Monitor de Rendimiento</span></div><div class="section-desc">CPU, RAM y disco en tiempo real — solo lectura</div></div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div class="perf-live" id="perf-live-indicator"><div class="perf-live-dot"></div><span>En vivo</span></div>
+      <button class="btn btn-secondary btn-sm" id="perf-pause-btn" onclick="togglePerfPause()">⏸ Pausar</button>
+      <select class="form-select" id="perf-interval" onchange="changePerfInterval()" style="padding:7px 10px;font-size:.8rem">
+        <option value="1000">1s</option><option value="2000" selected>2s</option><option value="5000">5s</option>
+      </select>
+    </div>
+  </div>
+  <div class="section-body">
+    <div id="perf-loading" class="loading-state"><div class="spinner"></div><span>Iniciando monitor...</span></div>
+    <div id="perf-content" style="display:none">
+      <div class="perf-grid-top">
+        <div class="perf-card">
+          <div class="perf-card-header">
+            <div class="perf-card-title">⚡ CPU</div>
+            <div><div class="perf-card-value" id="perf-cpu-pct">—</div><div class="perf-card-sub" id="perf-cpu-sub">—</div></div>
+          </div>
+          <div class="perf-gauge-wrap">
+            <svg width="160" height="90" viewBox="0 0 160 90">
+              <path d="M15,85 A65,65 0 0,1 145,85" fill="none" stroke="var(--border2)" stroke-width="14" stroke-linecap="round"/>
+              <path id="cpu-arc" d="M15,85 A65,65 0 0,1 145,85" fill="none" stroke="var(--accent)" stroke-width="14" stroke-linecap="round" stroke-dasharray="204" stroke-dashoffset="204" style="transition:stroke-dashoffset .5s ease,stroke .5s"/>
+              <text x="80" y="78" text-anchor="middle" fill="var(--txt)" font-family="'Share Tech Mono',monospace" font-size="18" font-weight="800" id="cpu-gauge-txt">0%</text>
+            </svg>
+          </div>
+          <div class="perf-chart-wrap"><canvas class="perf-canvas" id="chart-cpu"></canvas></div>
+        </div>
+        <div class="perf-card">
+          <div class="perf-card-header">
+            <div class="perf-card-title">🧠 RAM</div>
+            <div><div class="perf-card-value" id="perf-ram-pct">—</div><div class="perf-card-sub" id="perf-ram-sub">—</div></div>
+          </div>
+          <div class="ram-bar-section"><div class="ram-segments" id="ram-segments"></div><div class="ram-legend" id="ram-legend"></div></div>
+          <div class="perf-chart-wrap"><canvas class="perf-canvas" id="chart-ram"></canvas></div>
+        </div>
+        <div class="perf-card">
+          <div class="perf-card-header"><div class="perf-card-title">🖥️ Sistema</div></div>
+          <div style="padding:14px 16px;flex:1">
+            <div class="net-field"><span class="net-field-label">Uptime</span><span class="net-field-value highlight" id="perf-uptime">—</span></div>
+            <div class="net-field"><span class="net-field-label">Procesos</span><span class="net-field-value" id="perf-proc-count">—</span></div>
+            <div class="net-field"><span class="net-field-label">Threads</span><span class="net-field-value" id="perf-thread-count">—</span></div>
+            <div class="net-field"><span class="net-field-label">Handles</span><span class="net-field-value" id="perf-handle-count">—</span></div>
+            <div class="net-field"><span class="net-field-label">Procesador</span><span class="net-field-value" id="perf-cpu-name" style="font-size:.72rem;color:var(--txt3)">—</span></div>
+            <div class="net-field"><span class="net-field-label">Cores</span><span class="net-field-value" id="perf-cpu-cores">—</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom:8px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3)">💾 Disco — I/O en tiempo real</div>
+      <div class="disk-io-grid" id="perf-disk-grid"></div>
+      <div class="perf-procs">
+        <div class="perf-procs-header"><span>🔬 Top procesos</span><span style="font-size:.7rem;color:var(--txt3)">Ordenados por CPU</span></div>
+        <div class="perf-proc-row header-row">
+          <div class="perf-proc-name">Proceso</div>
+          <div class="perf-proc-val" style="text-align:right">CPU %</div>
+          <div class="perf-proc-val">RAM (MB)</div>
+          <div class="perf-proc-val">PID</div>
+          <div class="perf-proc-bar-cell">CPU bar</div>
+        </div>
+        <div id="perf-proc-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SERVICIOS ══ -->
+<section id="section-svc" class="section">
+  <div class="section-header">
+    <div><div class="section-title"><div class="section-title-icon">🔧</div><span>Servicios Windows</span></div>
+    <div class="section-desc">Gestiona los servicios del sistema — iniciar, detener, reiniciar y cambiar el tipo de arranque</div></div>
+    <button class="btn btn-secondary btn-sm" onclick="loadServices()">🔄 Actualizar</button>
+  </div>
+  <div class="section-body">
+    <div class="svc-toolbar">
+      <input type="text" class="svc-search" id="svc-search" placeholder="🔍 Buscar por nombre o descripción..." oninput="filterServices()">
+      <div class="svc-filter-group">
+        <button class="svc-filter-btn active" data-filter="all"     onclick="setSvcFilter('all')">Todos</button>
+        <button class="svc-filter-btn"        data-filter="running" onclick="setSvcFilter('running')">🟢 En ejecución</button>
+        <button class="svc-filter-btn"        data-filter="stopped" onclick="setSvcFilter('stopped')">🔴 Detenidos</button>
+        <button class="svc-filter-btn"        data-filter="auto"    onclick="setSvcFilter('auto')">⚡ Automático</button>
+      </div>
+      <div class="svc-stats" id="svc-stats"></div>
+    </div>
+    <div id="svc-loading" class="loading-state"><div class="spinner"></div><span>Cargando servicios...</span></div>
+    <div class="svc-table-wrap" id="svc-table-wrap" style="display:none">
+      <div class="svc-table-scroll">
+        <table class="svc-table">
+          <thead><tr>
+            <th onclick="sortSvc('DisplayName')" data-col="DisplayName">Servicio <span class="sort-icon" id="svc-sort-DisplayName">↑</span></th>
+            <th onclick="sortSvc('Status')" data-col="Status" style="width:120px">Estado <span class="sort-icon" id="svc-sort-Status">↕</span></th>
+            <th onclick="sortSvc('StartType')" data-col="StartType" style="width:130px">Arranque <span class="sort-icon" id="svc-sort-StartType">↕</span></th>
+            <th style="width:220px">Acciones</th>
+            <th style="width:150px">Tipo arranque</th>
+          </tr></thead>
+          <tbody id="svc-tbody"></tbody>
+        </table>
+      </div>
+      <div id="svc-footer" style="padding:10px 16px;background:var(--card2);border-top:1px solid var(--border);font-size:.75rem;color:var(--txt3);font-family:var(--font-mono)"></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-icon" id="modal-icon">⚠️</div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-desc" id="modal-desc"></div>
+    <div id="modal-extra"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+<div id="toast-container"></div>
+
+<script>
+/* ════════ MOCK DATA ════════════════════════════════════════════ */
+const MOCK = {
+  users: [
+    { Name:'jgonzalez', Path:'C:\\Users\\jgonzalez', LastAccess:'2026-03-08T10:22:00', LastAccessDisplay:'08/03/2026 10:22' },
+    { Name:'mlopez',    Path:'C:\\Users\\mlopez',    LastAccess:'2026-03-07T16:45:00', LastAccessDisplay:'07/03/2026 16:45' },
+    { Name:'aitorerrea',Path:'C:\\Users\\aitorerrea',LastAccess:'2026-01-15T09:10:00', LastAccessDisplay:'15/01/2026 09:10' },
+    { Name:'Administrador',Path:'C:\\Users\\Administrador',LastAccess:'2025-11-02T11:00:00', LastAccessDisplay:'02/11/2025 11:00' },
+    { Name:'svc_backup', Path:'C:\\Users\\svc_backup',LastAccess:'2024-06-20T07:30:00', LastAccessDisplay:'20/06/2024 07:30' },
+  ],
+  userSizes: {
+    jgonzalez:  { sizeBytes:14520000000, sizeDisplay:'13.52 GB' },
+    mlopez:     { sizeBytes:8340000000,  sizeDisplay:'7.77 GB'  },
+    aitorerrea: { sizeBytes:3210000000,  sizeDisplay:'2.99 GB'  },
+    Administrador:{ sizeBytes:512000000, sizeDisplay:'488.28 MB' },
+    svc_backup: { sizeBytes:128000000,   sizeDisplay:'122.07 MB' },
+  },
+  userFolders: {
+    jgonzalez:[ {Name:'Documents',Path:'C:\\Users\\jgonzalez\\Documents',SizeBytes:7340000000,SizeDisplay:'6.84 GB'},{Name:'Downloads',Path:'C:\\Users\\jgonzalez\\Downloads',SizeBytes:4210000000,SizeDisplay:'3.92 GB'},{Name:'AppData',Path:'C:\\Users\\jgonzalez\\AppData',SizeBytes:2100000000,SizeDisplay:'1.96 GB'},{Name:'Desktop',Path:'C:\\Users\\jgonzalez\\Desktop',SizeBytes:640000000,SizeDisplay:'610.35 MB'},{Name:'Pictures',Path:'C:\\Users\\jgonzalez\\Pictures',SizeBytes:230000000,SizeDisplay:'219.34 MB'}],
+    mlopez:   [ {Name:'Documents',Path:'C:\\Users\\mlopez\\Documents',SizeBytes:4100000000,SizeDisplay:'3.82 GB'},{Name:'Downloads',Path:'C:\\Users\\mlopez\\Downloads',SizeBytes:2800000000,SizeDisplay:'2.61 GB'},{Name:'AppData',Path:'C:\\Users\\mlopez\\AppData',SizeBytes:980000000,SizeDisplay:'934.60 MB'},{Name:'Videos',Path:'C:\\Users\\mlopez\\Videos',SizeBytes:460000000,SizeDisplay:'438.69 MB'}],
+    aitorerrea:[{Name:'Documents',Path:'C:\\Users\\aitorerrea\\Documents',SizeBytes:1900000000,SizeDisplay:'1.77 GB'},{Name:'AppData',Path:'C:\\Users\\aitorerrea\\AppData',SizeBytes:870000000,SizeDisplay:'829.77 MB'},{Name:'Downloads',Path:'C:\\Users\\aitorerrea\\Downloads',SizeBytes:440000000,SizeDisplay:'419.62 MB'}],
+    Administrador:[{Name:'AppData',Path:'C:\\Users\\Administrador\\AppData',SizeBytes:512000000,SizeDisplay:'488.28 MB'}],
+    svc_backup:[{Name:'AppData',Path:'C:\\Users\\svc_backup\\AppData',SizeBytes:128000000,SizeDisplay:'122.07 MB'}],
+  },
+  browseData: {
+    'C:\\Users\\jgonzalez\\Documents': {
+      currentPath:'C:\\Users\\jgonzalez\\Documents', parentPath:'C:\\Users\\jgonzalez',
+      items:[
+        {Name:'Proyectos_2024',FullPath:'C:\\Users\\jgonzalez\\Documents\\Proyectos_2024',Type:'folder',SizeBytes:-1,SizeDisplay:'--',Modified:'12/01/2026 14:32'},
+        {Name:'Informes',FullPath:'C:\\Users\\jgonzalez\\Documents\\Informes',Type:'folder',SizeBytes:-1,SizeDisplay:'--',Modified:'05/03/2026 09:10'},
+        {Name:'Contrato_2025.pdf',FullPath:'C:\\Users\\jgonzalez\\Documents\\Contrato_2025.pdf',Type:'file',SizeBytes:2400000,SizeDisplay:'2.29 MB',Modified:'20/02/2026 11:45'},
+        {Name:'Presupuesto_Q1.xlsx',FullPath:'C:\\Users\\jgonzalez\\Documents\\Presupuesto_Q1.xlsx',Type:'file',SizeBytes:890000,SizeDisplay:'869.14 KB',Modified:'01/03/2026 16:20'},
+        {Name:'Backup_antiguo.zip',FullPath:'C:\\Users\\jgonzalez\\Documents\\Backup_antiguo.zip',Type:'file',SizeBytes:1240000000,SizeDisplay:'1.15 GB',Modified:'15/06/2024 08:00'},
+        {Name:'notas_reunion.txt',FullPath:'C:\\Users\\jgonzalez\\Documents\\notas_reunion.txt',Type:'file',SizeBytes:12000,SizeDisplay:'11.72 KB',Modified:'07/03/2026 10:05'},
+      ]
+    }
+  },
+  drives:[
+    {Letter:'C',Label:'Sistema',Type:'Fijo',IsSystem:true,  TotalBytes:511000000000,FreeBytes:178000000000,UsedBytes:333000000000,UsedPercent:65,TotalDisplay:'476.04 GB',FreeDisplay:'165.80 GB',UsedDisplay:'310.24 GB'},
+    {Letter:'D',Label:'Datos',  Type:'Fijo',IsSystem:false, TotalBytes:999000000000,FreeBytes:612000000000,UsedBytes:387000000000,UsedPercent:39,TotalDisplay:'930.59 GB',FreeDisplay:'570.10 GB',UsedDisplay:'360.49 GB'},
+    {Letter:'E',Label:'Backup', Type:'Fijo',IsSystem:false, TotalBytes:2000000000000,FreeBytes:340000000000,UsedBytes:1660000000000,UsedPercent:83,TotalDisplay:'1.82 TB',FreeDisplay:'316.70 GB',UsedDisplay:'1.52 TB'},
+    {Letter:'F',Label:'USB 32GB',Type:'Extraíble',IsSystem:false,TotalBytes:32000000000,FreeBytes:18000000000,UsedBytes:14000000000,UsedPercent:44,TotalDisplay:'29.80 GB',FreeDisplay:'16.76 GB',UsedDisplay:'13.04 GB'},
+  ],
+  cleanupItems:[
+    {Id:'recycle_bin',Name:'Papelera de reciclaje',NameEu:'Birziklapen ontzia',Path:'$Recycle.Bin',Category:'Sistema',CategoryEu:'Sistema',CatOrder:0,SizeBytes:2340000000,SizeDisplay:'2.18 GB',RequiresAdmin:false,IsSpecial:true},
+    {Id:'user_temp',Name:'Archivos temporales (usuario)',NameEu:'Erabiltzaile aldi baterakoak',Path:'C:\\Users\\jgonzalez\\AppData\\Local\\Temp',Category:'Sistema',CategoryEu:'Sistema',CatOrder:0,SizeBytes:890000000,SizeDisplay:'849.03 MB',RequiresAdmin:false},
+    {Id:'win_temp',Name:'Archivos temporales (Windows)',NameEu:'Windows aldi baterakoak',Path:'C:\\Windows\\Temp',Category:'Sistema',CategoryEu:'Sistema',CatOrder:0,SizeBytes:230000000,SizeDisplay:'219.34 MB',RequiresAdmin:true},
+    {Id:'thumb_cache',Name:'Cache de miniaturas',NameEu:'Miniatura cachea',Path:'C:\\Users\\...\\Explorer',Category:'Sistema',CategoryEu:'Sistema',CatOrder:0,SizeBytes:45000000,SizeDisplay:'42.91 MB',RequiresAdmin:false},
+    {Id:'recent_docs',Name:'Documentos recientes',NameEu:'Azken dokumentuak',Path:'C:\\Users\\...\\Recent',Category:'Sistema',CategoryEu:'Sistema',CatOrder:0,SizeBytes:1200000,SizeDisplay:'1.14 MB',RequiresAdmin:false},
+    {Id:'memdumps',Name:'Volcados de memoria',NameEu:'Memoria hustuketa',Path:'C:\\Windows\\Minidump',Category:'Sistema',CategoryEu:'Sistema',CatOrder:0,SizeBytes:0,SizeDisplay:'0 B',RequiresAdmin:true},
+    {Id:'cbs_logs',Name:'Logs CBS de Windows',NameEu:'CBS erregistroak',Path:'C:\\Windows\\Logs\\CBS',Category:'Registros y Logs',CategoryEu:'Erregistroak',CatOrder:1,SizeBytes:124000000,SizeDisplay:'118.26 MB',RequiresAdmin:true},
+    {Id:'wu_logs',Name:'Logs de Windows Update',NameEu:'WU erregistroak',Path:'C:\\Windows\\Logs\\WindowsUpdate',Category:'Registros y Logs',CategoryEu:'Erregistroak',CatOrder:1,SizeBytes:34000000,SizeDisplay:'32.43 MB',RequiresAdmin:true},
+    {Id:'wer',Name:'Informes de errores de Windows',NameEu:'Windows errore-txostenak',Path:'C:\\ProgramData\\Microsoft\\Windows\\WER',Category:'Registros y Logs',CategoryEu:'Erregistroak',CatOrder:1,SizeBytes:89000000,SizeDisplay:'84.88 MB',RequiresAdmin:true},
+    {Id:'prefetch',Name:'Archivos Prefetch',NameEu:'Prefetch fitxategiak',Path:'C:\\Windows\\Prefetch',Category:'Avanzado',CategoryEu:'Aurreratua',CatOrder:2,SizeBytes:67000000,SizeDisplay:'63.90 MB',RequiresAdmin:true},
+    {Id:'wu_cache',Name:'Cache de Windows Update',NameEu:'WU cachea',Path:'C:\\Windows\\SoftwareDistribution\\Download',Category:'Avanzado',CategoryEu:'Aurreratua',CatOrder:2,SizeBytes:1890000000,SizeDisplay:'1.76 GB',RequiresAdmin:true},
+    {Id:'inetcache',Name:'Cache Internet Explorer/Edge',NameEu:'IE/Edge cachea',Path:'C:\\Users\\...\\INetCache',Category:'Avanzado',CategoryEu:'Aurreratua',CatOrder:2,SizeBytes:340000000,SizeDisplay:'324.25 MB',RequiresAdmin:false},
+    {Id:'dns_cache',Name:'Cache DNS',NameEu:'DNS cachea',Path:'',Category:'Avanzado',CategoryEu:'Aurreratua',CatOrder:2,SizeBytes:0,SizeDisplay:'—',RequiresAdmin:true,IsSpecial:true},
+    {Id:'chrome_cache',Name:'Chrome - Cache',NameEu:'Chrome - Cachea',Path:'C:\\Users\\...\\Chrome\\Cache',Category:'Navegadores',CategoryEu:'Nabigatzaileak',CatOrder:3,SizeBytes:780000000,SizeDisplay:'743.87 MB',RequiresAdmin:false},
+    {Id:'chrome_hist',Name:'Chrome - Historial',NameEu:'Chrome - Historia',Path:'C:\\Users\\...\\Chrome\\History',Category:'Navegadores',CategoryEu:'Nabigatzaileak',CatOrder:3,SizeBytes:12000000,SizeDisplay:'11.44 MB',RequiresAdmin:false,IsSpecial:true},
+    {Id:'chrome_cookies',Name:'Chrome - Cookies',NameEu:'Chrome - Cookieak',Path:'C:\\Users\\...\\Chrome\\Cookies',Category:'Navegadores',CategoryEu:'Nabigatzaileak',CatOrder:3,SizeBytes:4500000,SizeDisplay:'4.29 MB',RequiresAdmin:false,IsSpecial:true},
+    {Id:'edge_cache',Name:'Edge - Cache',NameEu:'Edge - Cachea',Path:'C:\\Users\\...\\Edge\\Cache',Category:'Navegadores',CategoryEu:'Nabigatzaileak',CatOrder:3,SizeBytes:450000000,SizeDisplay:'429.15 MB',RequiresAdmin:false},
+    {Id:'edge_hist',Name:'Edge - Historial',NameEu:'Edge - Historia',Path:'C:\\Users\\...\\Edge\\History',Category:'Navegadores',CategoryEu:'Nabigatzaileak',CatOrder:3,SizeBytes:8900000,SizeDisplay:'8.49 MB',RequiresAdmin:false,IsSpecial:true},
+  ],
+  localUsers:[
+    {Name:'jgonzalez', FullName:'Jon González Arrieta', Enabled:true, LastLogon:'08/03/2026 10:22', Groups:'Administradores', IsAdmin:true, Description:'Usuario principal - IT'},
+    {Name:'mlopez',    FullName:'María López Fernández', Enabled:true, LastLogon:'07/03/2026 16:45', Groups:'Usuarios', IsAdmin:false, Description:''},
+    {Name:'aitorerrea',FullName:'Aitor Errea Etxeberria', Enabled:true, LastLogon:'15/01/2026 09:10', Groups:'Usuarios', IsAdmin:false, Description:'Técnico externo'},
+    {Name:'Administrador',FullName:'', Enabled:false, LastLogon:'02/11/2025 11:00', Groups:'Administradores', IsAdmin:true, Description:'Cuenta predeterminada del sistema'},
+    {Name:'svc_backup', FullName:'Backup Service', Enabled:true, LastLogon:'Nunca', Groups:'Usuarios', IsAdmin:false, Description:'Cuenta de servicio'},
+  ],
+  pstFiles:[
+    {Name:'Outlook_2024.pst', Path:'D:\\Usuarios\\jgonzalez\\Outlook_2024.pst', SizeBytes:4200000000, SizeDisplay:'3.91 GB', LastModified:'15/02/2026'},
+    {Name:'Archivo_2023.pst', Path:'D:\\Usuarios\\jgonzalez\\Archivo_2023.pst', SizeBytes:2800000000, SizeDisplay:'2.61 GB', LastModified:'20/01/2024'},
+    {Name:'mlopez_mail.pst',  Path:'D:\\Usuarios\\mlopez\\mlopez_mail.pst',     SizeBytes:1100000000, SizeDisplay:'1.02 GB', LastModified:'07/03/2026'},
+    {Name:'backup_old.pst',   Path:'E:\\Backups\\PST\\backup_old.pst',          SizeBytes:8900000000, SizeDisplay:'8.29 GB', LastModified:'10/06/2023'},
+  ],
+  network:[
+    {Name:'Ethernet',Description:'Intel(R) Ethernet Connection I219-LM',Status:'Up',MacAddress:'A4-BB-6D-12-3F-E2',IPAddress:'192.168.1.105',SubnetMask:'255.255.255.0',Gateway:'192.168.1.1',DnsServers:['192.168.1.1','8.8.8.8'],DhcpEnabled:true,LinkSpeedMbps:1000},
+    {Name:'Wi-Fi',Description:'Intel(R) Wi-Fi 6 AX201 160MHz',Status:'Up',MacAddress:'CC-20-E8-45-7A-F1',IPAddress:'192.168.1.110',SubnetMask:'255.255.255.0',Gateway:'192.168.1.1',DnsServers:['192.168.1.1','1.1.1.1'],DhcpEnabled:true,LinkSpeedMbps:433},
+    {Name:'VPN (OpenVPN TAP)',Description:'TAP-Windows Adapter V9',Status:'Disconnected',MacAddress:'00-FF-44-2C-89-A1',IPAddress:'',SubnetMask:'',Gateway:'',DnsServers:[],DhcpEnabled:false,LinkSpeedMbps:0},
+    {Name:'Loopback Pseudo-Interface 1',Description:'Software Loopback Interface 1',Status:'Up',MacAddress:'',IPAddress:'127.0.0.1',SubnetMask:'255.0.0.0',Gateway:'',DnsServers:[],DhcpEnabled:false,LinkSpeedMbps:0},
+  ],
+  services: [
+    {Name:'Spooler',        DisplayName:'Cola de impresión',               Status:'Running', StartType:'Automatic', Description:'Pone en cola los trabajos de impresión y controla la interacción con la impresora.'},
+    {Name:'wuauserv',       DisplayName:'Windows Update',                  Status:'Running', StartType:'Automatic', Description:'Permite la detección, descarga e instalación de actualizaciones de Windows.'},
+    {Name:'WSearch',        DisplayName:'Windows Search',                  Status:'Running', StartType:'Automatic', Description:'Proporciona indexación de contenido, almacenamiento en caché de propiedades y resultados de búsqueda.'},
+    {Name:'Winmgmt',        DisplayName:'Instrumental de administración de Windows', Status:'Running', StartType:'Automatic', Description:'Proporciona una interfaz común para el acceso a la información de administración.'},
+    {Name:'BITS',           DisplayName:'Servicio de transferencia inteligente en segundo plano', Status:'Running', StartType:'Automatic', Description:'Transfiere archivos en segundo plano usando ancho de banda de red inactivo.'},
+    {Name:'Schedule',       DisplayName:'Programador de tareas',           Status:'Running', StartType:'Automatic', Description:'Permite configurar y programar tareas automatizadas en este equipo.'},
+    {Name:'eventlog',       DisplayName:'Registro de eventos de Windows',  Status:'Running', StartType:'Automatic', Description:'Permite que los componentes de Windows y aplicaciones publiquen, visualicen y consulten eventos.'},
+    {Name:'LanmanServer',   DisplayName:'Servidor',                        Status:'Running', StartType:'Automatic', Description:'Admite el uso compartido de archivos, impresoras y canalizaciones con nombre a través de la red.'},
+    {Name:'LanmanWorkstation',DisplayName:'Estación de trabajo',           Status:'Running', StartType:'Automatic', Description:'Crea y mantiene conexiones de red de cliente a servidores remotos.'},
+    {Name:'Dhcp',           DisplayName:'Cliente DHCP',                    Status:'Running', StartType:'Automatic', Description:'Registra y actualiza las direcciones IP y los registros DNS para este equipo.'},
+    {Name:'Dnscache',       DisplayName:'Cliente DNS',                     Status:'Running', StartType:'Automatic', Description:'Almacena en caché los nombres del Sistema de nombres de dominio (DNS).'},
+    {Name:'RpcSs',          DisplayName:'Llamada a procedimiento remoto (RPC)', Status:'Running', StartType:'Automatic', Description:'El servicio RPCSS es el Administrador de control de servicios para servidores COM y DCOM.'},
+    {Name:'lsass',          DisplayName:'Autoridad de seguridad local',    Status:'Running', StartType:'Automatic', Description:'El proceso LSASS es responsable de la directiva de seguridad local del sistema.'},
+    {Name:'SysMain',        DisplayName:'SysMain (SuperFetch)',            Status:'Running', StartType:'Automatic', Description:'Mantiene y mejora el rendimiento del sistema a lo largo del tiempo.'},
+    {Name:'AudioSrv',       DisplayName:'Audio de Windows',                Status:'Running', StartType:'Automatic', Description:'Administra el audio para los programas basados en Windows.'},
+    {Name:'Audiosrv',       DisplayName:'Servicio de audio de Windows',    Status:'Running', StartType:'Manual',    Description:'Administra dispositivos de audio para programas basados en Windows.'},
+    {Name:'TabletInputService',DisplayName:'Servicio de panel de entrada de Tablet PC', Status:'Stopped', StartType:'Manual', Description:'Activa la funcionalidad de bolígrafo y entrada de lápiz del Tablet PC.'},
+    {Name:'RemoteRegistry', DisplayName:'Registro remoto',                 Status:'Stopped', StartType:'Disabled',  Description:'Permite a los usuarios remotos modificar la configuración del Registro de este equipo.'},
+    {Name:'TapiSrv',        DisplayName:'Telefonía',                       Status:'Stopped', StartType:'Manual',    Description:'Proporciona compatibilidad con Telephony API (TAPI) para programas que controlan dispositivos telefónicos.'},
+    {Name:'WerSvc',         DisplayName:'Servicio de informes de errores de Windows', Status:'Stopped', StartType:'Manual', Description:'Permite que los errores se comuniquen cuando los programas dejan de funcionar.'},
+    {Name:'XblGameSave',    DisplayName:'Servicio de guardado de juego de Xbox Live', Status:'Stopped', StartType:'Disabled', Description:'Este servicio sincroniza datos de guardado para Juegos habilitados para Xbox Live.'},
+    {Name:'XboxNetApiSvc',  DisplayName:'Servicio de red de Xbox Live',    Status:'Stopped', StartType:'Disabled',  Description:'Este servicio admite la interfaz de programación de aplicaciones Windows.Networking.XboxLive.'},
+    {Name:'MapsBroker',     DisplayName:'Administrador de mapas descargados', Status:'Stopped', StartType:'Automatic', Description:'Servicio de Windows para el acceso de aplicaciones a los mapas descargados.'},
+    {Name:'wbengine',       DisplayName:'Servicio de motor de copia de seguridad en bloque', Status:'Stopped', StartType:'Manual', Description:'El servicio de motor de copia de seguridad en bloque se utiliza en copias de seguridad de Windows.'},
+    {Name:'Browser',        DisplayName:'Examinador de equipos',           Status:'Stopped', StartType:'Disabled',  Description:'Mantiene una lista actualizada de los equipos de la red.'},
+  ]
+};
+
+/* ════════ MOCK API ═════════════════════════════════════════════ */
+const api = {
+  get: (url) => new Promise((res) => {
+    setTimeout(() => {
+      if (url.includes('/api/users'))         return res(MOCK.users);
+      if (url.includes('/api/user-size'))     { const u=new URL(url,location).searchParams.get('username'); return res(MOCK.userSizes[u]||{sizeBytes:0,sizeDisplay:'0 B'}); }
+      if (url.includes('/api/user-folders'))  { const u=new URL(url,location).searchParams.get('username'); return res(MOCK.userFolders[u]||[]); }
+      if (url.includes('/api/browse'))        { const p=decodeURIComponent(new URL(url,location).searchParams.get('path')); return res(MOCK.browseData[p]||{currentPath:p,parentPath:p.split('\\').slice(0,-1).join('\\')||'',items:[]}); }
+      if (url.includes('/api/drives'))        return res(MOCK.drives);
+      if (url.includes('/api/cleanup-preview')) return res(MOCK.cleanupItems);
+      if (url.includes('/api/cleanup-size'))  { const id=new URL(url,location).searchParams.get('id'); const item=MOCK.cleanupItems.find(i=>i.Id===id); return res(item?{id,sizeBytes:item.SizeBytes,sizeDisplay:item.SizeDisplay}:{id,sizeBytes:0,sizeDisplay:'0 B'}); }
+      if (url.includes('/api/local-users'))   return res(MOCK.localUsers);
+      if (url.includes('/api/scan-pst'))      return res(MOCK.pstFiles);
+      if (url.includes('/api/network'))       return res(MOCK.network);
+      if (url.includes('/api/perf'))          return res(genPerfSnap());
+      if (url.includes('/api/services'))      return res([...MOCK.services].sort((a,b)=>a.DisplayName.localeCompare(b.DisplayName)));
+      res({});
+    }, 400 + Math.random()*300);
+  }),
+  post: (url, data) => new Promise((res) => {
+    setTimeout(() => {
+      if (url.includes('/api/local-user-create'))   { MOCK.localUsers.push({Name:data.username,FullName:data.fullname||'',Enabled:true,LastLogon:'Nunca',Groups:data.isAdmin?'Administradores':'Usuarios',IsAdmin:!!data.isAdmin,Description:data.description||''}); return res({success:true}); }
+      if (url.includes('/api/local-user-delete'))   { const i=MOCK.localUsers.findIndex(u=>u.Name===data.username); if(i>-1)MOCK.localUsers.splice(i,1); return res({success:true}); }
+      if (url.includes('/api/local-user-toggle'))   { const u=MOCK.localUsers.find(u=>u.Name===data.username); if(u)u.Enabled=data.enable; return res({success:true,enabled:data.enable}); }
+      if (url.includes('/api/local-user-password')) return res({success:true});
+      if (url.includes('/api/cleanup'))             return res({success:true});
+      if (url.includes('/api/copy-pst'))            return res({success:true,results:data.files.map(f=>({path:f,success:true}))});
+      if (url.includes('/api/format'))              return res({success:true,message:'Diálogo abierto (simulación)'});
+      if (url.includes('/api/recycle'))             return res({ok:data.paths.length,total:data.paths.length});
+      if (url.includes('/api/flush-dns'))           return res({success:true});
+      if (url.includes('/api/release-ip'))          return res({success:true});
+      if (url.includes('/api/renew-ip'))            return res({success:true});
+      if (url.includes('/api/ping')) {
+        const results=[];
+        for(let i=1;i<=data.count;i++){
+          const ok=Math.random()>0.1;
+          results.push({Seq:i,Address:data.host,Latency:ok?Math.floor(5+Math.random()*60):0,Success:ok});
+        }
+        return res({results});
+      }
+      if (url.includes('/api/service-action')) {
+        const svc=MOCK.services.find(s=>s.Name===data.name);
+        if(svc){
+          if(data.action==='start'||data.action==='restart') svc.Status='Running';
+          else if(data.action==='stop') svc.Status='Stopped';
+        }
+        return res({success:true});
+      }
+      if (url.includes('/api/service-startup')) {
+        const svc=MOCK.services.find(s=>s.Name===data.name);
+        if(svc) svc.StartType=data.startType;
+        return res({success:true});
+      }
+      res({success:true});
+    }, 600 + Math.random()*400);
+  })
+};
+
+/* ════════ CORE UTILS ═══════════════════════════════════════════ */
+let currentLang = 'es';
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('langES').classList.toggle('active', lang==='es');
+  document.getElementById('langEU').classList.toggle('active', lang==='eu');
+}
+function t(key) { return key; } // simplified - keys are already Spanish
+
+function navigate(section) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('section-'+section).classList.add('active');
+  document.querySelector('.nav-item[data-section="'+section+'"]').classList.add('active');
+
+  if(section!=='perf'&&perfInterval){clearInterval(perfInterval);perfInterval=null;perfStarted=false;perfHistory.cpu=[];perfHistory.ram=[];}
+  if(section!=='svc') svcLoaded=false;
+
+  if (section==='users'   && !usersLoaded)   loadUsers();
+  if (section==='format'  && !drivesLoaded)  loadDrives();
+  if (section==='cleanup' && !cleanupLoaded) loadCleanup();
+  if (section==='network' && !networkLoaded) loadNetwork();
+  if (section==='perf'    && !perfStarted)   startPerf();
+  if (section==='svc'     && !svcLoaded)     loadServices();
+}
+
+function toast(msg, type='info') {
+  const icons={success:'✅',error:'❌',info:'ℹ️',warn:'⚠️'};
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>el.remove(),3500);
+}
+
+function showModal({icon='⚠️',title,desc,extra='',actions}) {
+  document.getElementById('modal-icon').textContent=icon;
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-desc').textContent=desc||'';
+  document.getElementById('modal-extra').innerHTML=extra;
+  const actEl=document.getElementById('modal-actions');
+  actEl.innerHTML='';
+  actions.forEach(a=>{
+    const btn=document.createElement('button');
+    btn.className=`btn ${a.cls||'btn-secondary'}`;
+    btn.innerHTML=a.label;
+    btn.onclick=()=>{ closeModal(); a.action&&a.action(); };
+    actEl.appendChild(btn);
+  });
+  document.getElementById('modal-overlay').classList.add('visible');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('visible'); }
+document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+function formatBytes(b) {
+  b=Number(b); if(b<=0) return '0 B';
+  if(b>=1073741824) return (b/1073741824).toFixed(2)+' GB';
+  if(b>=1048576)    return (b/1048576).toFixed(2)+' MB';
+  if(b>=1024)       return (b/1024).toFixed(2)+' KB';
+  return b+' B';
+}
+function ageDays(d) { return Math.floor((Date.now()-new Date(d))/86400000); }
+function accessBadge(d) {
+  const days=ageDays(d);
+  if(days<=30)  return '<span class="badge badge-green">Reciente</span>';
+  if(days<=180) return '<span class="badge badge-amber">Antiguo</span>';
+  return '<span class="badge badge-red">Muy antiguo</span>';
+}
+function sizeFill(b,max) { return max>0?Math.min(100,Math.round(b/max*100)):0; }
+function usageColor(p) {
+  if(p<70) return 'linear-gradient(90deg,var(--accent2),var(--accent))';
+  if(p<85) return 'linear-gradient(90deg,#cc8800,var(--amber))';
+  return 'linear-gradient(90deg,#cc2222,var(--red))';
+}
+
+/* ════════ MÓDULO 1 — USUARIOS ══════════════════════════════════ */
+let usersLoaded=false, usersData=[], openUser=null, currentUsersTab='catalog';
+
+async function loadUsers() {
+  usersLoaded=true;
+  document.getElementById('users-loading').style.display='flex';
+  document.getElementById('users-table-wrap').style.display='none';
+  document.getElementById('users-empty').style.display='none';
+  document.getElementById('users-stats').style.display='none';
+  document.getElementById('folders-panel-container').innerHTML='';
+  document.getElementById('explorer-container').innerHTML='';
+  openUser=null;
+  usersData=await api.get('/api/users');
+  renderUsersTable();
+}
+
+function renderUsersTable() {
+  document.getElementById('users-loading').style.display='none';
+  document.getElementById('users-table-wrap').style.display='block';
+  document.getElementById('users-stats').style.display='grid';
+  document.getElementById('stat-users').textContent=usersData.length;
+  document.getElementById('stat-totalsize').textContent='...';
+  document.getElementById('stat-largest').textContent='...';
+  const tbody=document.getElementById('users-tbody');
+  tbody.innerHTML='';
+  usersData.forEach((u,i)=>{
+    const tr=document.createElement('tr');
+    tr.id='user-row-'+i;
+    tr.innerHTML=`
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;border-radius:8px;background:var(--card2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:var(--accent);font-family:var(--font-mono);flex-shrink:0">${u.Name.substring(0,2).toUpperCase()}</div>
+        <div><div style="font-weight:600">${u.Name}</div><div class="mono" style="font-size:.72rem;color:var(--txt3)">${u.Path}</div></div>
+      </div></td>
+      <td><div>${u.LastAccessDisplay}</div><div style="margin-top:4px">${accessBadge(u.LastAccess)}</div></td>
+      <td><div id="user-size-${i}" style="display:flex;align-items:center;gap:8px">
+        <span class="mono" style="color:var(--txt3)">—</span>
+        <button class="btn btn-secondary btn-xs" onclick="calcUserSize(${i},'${u.Name}',this)">Calcular</button>
+      </div></td>
+      <td><button class="btn btn-secondary btn-xs" id="folders-btn-${i}" onclick="toggleFolders(${i},'${u.Name}')">📁 Ver carpetas</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+async function calcUserSize(idx,username,btn) {
+  btn.disabled=true; btn.textContent='...';
+  const data=await api.get(`/api/user-size?username=${encodeURIComponent(username)}`);
+  usersData[idx].sizeBytes=data.sizeBytes; usersData[idx].sizeDisplay=data.sizeDisplay;
+  const maxBytes=Math.max(...usersData.filter(u=>u.sizeBytes>0).map(u=>u.sizeBytes));
+  const pct=sizeFill(data.sizeBytes,maxBytes);
+  document.getElementById('user-size-'+idx).innerHTML=`
+    <div class="size-bar-wrap" style="min-width:130px">
+      <div class="size-bar"><div class="size-bar-fill ${pct>80?'warn':''}" style="width:${pct}%"></div></div>
+      <span class="size-val">${data.sizeDisplay}</span>
+    </div>`;
+  const calc=usersData.filter(u=>u.sizeBytes>0);
+  const total=calc.reduce((s,u)=>s+(u.sizeBytes||0),0);
+  const largest=calc.reduce((a,b)=>a.sizeBytes>b.sizeBytes?a:b);
+  document.getElementById('stat-totalsize').textContent=formatBytes(total);
+  document.getElementById('stat-largest').textContent=largest.Name;
+}
+
+async function toggleFolders(idx,username) {
+  const container=document.getElementById('folders-panel-container');
+  const btn=document.getElementById('folders-btn-'+idx);
+  if(openUser===idx) {
+    container.innerHTML=''; btn.innerHTML='📁 Ver carpetas';
+    openUser=null;
+    document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('selected-row'));
+    return;
+  }
+  openUser=idx;
+  document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('selected-row'));
+  document.getElementById('user-row-'+idx).classList.add('selected-row');
+  btn.innerHTML='⏳ ...';
+  container.innerHTML='<div class="loading-state"><div class="spinner spinner-sm"></div> Cargando...</div>';
+  const folders=await api.get(`/api/user-folders?username=${encodeURIComponent(username)}`);
+  const maxB=folders.length>0?folders[0].SizeBytes:1;
+  let html=`<div class="folders-panel"><div class="folders-panel-title">📁 Subcarpetas de <strong>${username}</strong></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Tamaño</th><th>Carpeta</th><th>Acciones</th></tr></thead><tbody>`;
+  folders.forEach(f=>{
+    const pct=sizeFill(f.SizeBytes,maxB);
+    const fpathEsc=f.Path.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    html+=`<tr>
+      <td style="min-width:200px"><div class="size-bar-wrap"><div class="size-bar"><div class="size-bar-fill ${pct>80?'warn':''}" style="width:${pct}%"></div></div><span class="size-val">${f.SizeDisplay}</span></div></td>
+      <td class="mono" style="color:var(--txt2)">${f.Name}</td>
+      <td><button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();browsePath('${fpathEsc}');document.getElementById('explorer-container').scrollIntoView({behavior:'smooth'})">📂 Explorar</button></td>
+    </tr>`;
+  });
+  html+='</tbody></table></div></div>';
+  container.innerHTML=html;
+  btn.innerHTML='🙈 Ocultar';
+}
+
+/* Explorer */
+let explorerState={path:null,selected:new Set(),data:null};
+
+async function browsePath(path) {
+  const container=document.getElementById('explorer-container');
+  container.innerHTML='<div class="loading-state" style="padding:24px"><div class="spinner spinner-sm"></div> Cargando...</div>';
+  const data=await api.get('/api/browse?path='+encodeURIComponent(path));
+  explorerState={path:data.currentPath,selected:new Set(),data};
+  renderExplorer(data);
+}
+
+function renderExplorer(data) {
+  const container=document.getElementById('explorer-container');
+  const parts=data.currentPath.replace(/\\/g,'/').split('/').filter(Boolean);
+  let breadHTML=''; let acc='';
+  parts.forEach((p,i)=>{
+    acc+=(i===0?'':'\\')+p; if(i===0) acc=p+':\\';
+    const isLast=i===parts.length-1; const snap=acc;
+    if(isLast) breadHTML+=`<span class="breadcrumb-current">${p}</span>`;
+    else breadHTML+=`<span class="breadcrumb-part" onclick="browsePath('${snap.replace(/\\/g,'\\\\')}')">${p}</span><span class="breadcrumb-sep">/</span>`;
+  });
+  const items=data.items||[];
+  const selCount=explorerState.selected.size;
+  const icons={pdf:'📄',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',zip:'🗜️',jpg:'🖼️',png:'🖼️',mp4:'🎬',mp3:'🎵',exe:'⚙️',txt:'📃',pst:'📧'};
+  const getIcon=name=>{ const ext=name.split('.').pop().toLowerCase(); return icons[ext]||'📄'; };
+  let rowsHTML='';
+  if(!items.length) rowsHTML='<div class="explorer-empty">📭 Carpeta vacía</div>';
+  else items.forEach((item,idx)=>{
+    const isFolder=item.Type==='folder';
+    const icon=isFolder?'📁':getIcon(item.Name);
+    const sel=explorerState.selected.has(item.FullPath);
+    const pEsc=item.FullPath.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    rowsHTML+=`<div class="explorer-row ${isFolder?'is-folder':''} ${sel?'selected-file':''}" id="erow-${idx}"
+      onclick="explorerRowClick(event,${idx},'${pEsc}',${isFolder})"
+      ondblclick="${isFolder?`browsePath('${pEsc}')`:''}" >
+      <div style="text-align:center"><input type="checkbox" style="accent-color:var(--accent);width:14px;height:14px" ${sel?'checked':''} onclick="event.stopPropagation();explorerToggle('${pEsc}',this.checked,${idx})" id="echk-${idx}"></div>
+      <div class="explorer-name" title="${item.FullPath}">${icon} ${item.Name}</div>
+      <div class="explorer-size">${item.SizeDisplay}</div>
+      <div class="explorer-date">${item.Modified}</div>
+    </div>`;
+  });
+  const hasParent=data.parentPath&&data.parentPath!==data.currentPath;
+  container.innerHTML=`<div class="explorer-panel">
+    <div class="explorer-header">
+      <div><div class="explorer-title">📂 Explorador de archivos</div><div class="breadcrumb">${breadHTML}</div></div>
+      <button class="btn btn-secondary btn-xs" onclick="closeExplorer()">✕</button>
+    </div>
+    <div class="explorer-toolbar">
+      ${hasParent?`<button class="btn btn-secondary btn-xs" onclick="browsePath('${data.parentPath.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">⬆️ Subir nivel</button>`:''}
+      <button class="btn btn-secondary btn-xs" onclick="explorerSelectAll()">Sel. todo</button>
+      <button class="btn btn-danger btn-xs" id="recycle-btn" onclick="recycleSelected()" ${selCount===0?'disabled':''}>🗑️ Mover a papelera ${selCount>0?'('+selCount+')':''}</button>
+      <span class="explorer-stats">${items.length} elementos</span>
+    </div>
+    <div class="explorer-th"><div></div><div>Nombre</div><div style="text-align:right;padding-right:12px">Tamaño</div><div>Modificado</div></div>
+    <div class="explorer-body">${rowsHTML}</div>
+  </div>`;
+}
+
+function explorerRowClick(e,idx,path,isFolder) {
+  if(e.target.type==='checkbox') return;
+  const chk=document.getElementById('echk-'+idx);
+  if(chk){chk.checked=!chk.checked; explorerToggle(path,chk.checked,idx);}
+}
+function explorerToggle(path,checked,idx) {
+  checked?explorerState.selected.add(path):explorerState.selected.delete(path);
+  document.getElementById('erow-'+idx)?.classList.toggle('selected-file',checked);
+  const btn=document.getElementById('recycle-btn');
+  if(btn){const c=explorerState.selected.size; btn.disabled=c===0; btn.innerHTML=`🗑️ Mover a papelera ${c>0?'('+c+')':''}`;}
+}
+function explorerSelectAll() {
+  if(!explorerState.data) return;
+  const items=explorerState.data.items||[];
+  const allSel=explorerState.selected.size===items.length;
+  explorerState.selected.clear();
+  if(!allSel) items.forEach(i=>explorerState.selected.add(i.FullPath));
+  renderExplorer(explorerState.data);
+}
+function closeExplorer() { document.getElementById('explorer-container').innerHTML=''; explorerState={path:null,selected:new Set(),data:null}; }
+async function recycleSelected() {
+  const paths=Array.from(explorerState.selected);
+  if(!paths.length) { toast('No hay elementos seleccionados','warn'); return; }
+  showModal({icon:'🗑️',title:'Mover a papelera',desc:`Se moverán ${paths.length} elemento(s) a la papelera de reciclaje.`,actions:[
+    {label:'Cancelar',cls:'btn-secondary'},
+    {label:'🗑️ Confirmar',cls:'btn-danger',action:async()=>{
+      const res=await api.post('/api/recycle',{paths});
+      toast(`${res.ok} elemento(s) movidos a la papelera`,'success');
+      if(explorerState.path) await browsePath(explorerState.path);
+    }}
+  ]});
+}
+
+/* ════════ MÓDULO 1b — USUARIOS LOCALES ════════════════════════ */
+let localUsersLoaded=false, localUsersData=[];
+
+function switchUsersTab(tab) {
+  currentUsersTab=tab;
+  const isCat=tab==='catalog';
+  const catalogIds=['users-stats','users-loading','users-empty','users-table-wrap','folders-panel-container','explorer-container'];
+  if(isCat){
+    catalogIds.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el&&el.dataset.hiddenByTab==='1'){el.style.display=el.dataset.prevDisplay||'';delete el.dataset.hiddenByTab;delete el.dataset.prevDisplay;}
+    });
+    document.getElementById('local-users-panel').style.display='none';
+    if(!usersLoaded) loadUsers();
+  } else {
+    catalogIds.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){el.dataset.prevDisplay=el.style.display;el.dataset.hiddenByTab='1';el.style.display='none';}
+    });
+    document.getElementById('local-users-panel').style.display='block';
+    if(!localUsersLoaded) loadLocalUsers();
+  }
+  document.getElementById('tab-c-users').style.borderBottom=isCat?'2px solid var(--accent)':'2px solid transparent';
+  document.getElementById('tab-local-users').style.borderBottom=!isCat?'2px solid var(--accent)':'2px solid transparent';
+}
+
+function refreshCurrentUsersTab() {
+  if(currentUsersTab==='catalog'){usersLoaded=false;loadUsers();}
+  else{localUsersLoaded=false;loadLocalUsers();}
+}
+
+async function loadLocalUsers() {
+  localUsersLoaded=true;
+  document.getElementById('local-users-loading').style.display='flex';
+  document.getElementById('local-users-table-wrap').style.display='none';
+  localUsersData=await api.get('/api/local-users');
+  renderLocalUsers();
+}
+
+function renderLocalUsers() {
+  document.getElementById('local-users-loading').style.display='none';
+  document.getElementById('local-users-table-wrap').style.display='block';
+  const tbody=document.getElementById('local-users-tbody');
+  tbody.innerHTML='';
+  localUsersData.forEach(u=>{
+    const tr=document.createElement('tr');
+    const statusBadge=u.Enabled?`<span class="badge badge-green">🟢 Activo</span>`:`<span class="badge badge-red">🔴 Inactivo</span>`;
+    const adminBadge=u.IsAdmin?`<span class="badge badge-amber" style="margin-left:4px">🔐 Admin</span>`:'';
+    tr.innerHTML=`
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;border-radius:8px;background:var(--card2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:${u.IsAdmin?'var(--amber)':'var(--accent)'};font-family:var(--font-mono);flex-shrink:0">${u.Name.substring(0,2).toUpperCase()}</div>
+        <div><div style="font-weight:600">${u.Name}</div><div style="font-size:.75rem;color:var(--txt3)">${u.FullName||'—'}</div>${u.Description?`<div style="font-size:.72rem;color:var(--txt3);font-style:italic">${u.Description}</div>`:''}</div>
+      </div></td>
+      <td>${statusBadge}${adminBadge}</td>
+      <td><span class="mono" style="font-size:.78rem;color:var(--txt2)">${u.Groups||'—'}</span></td>
+      <td><span class="mono" style="font-size:.8rem">${u.LastLogon}</span></td>
+      <td><div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-xs" onclick="toggleLocalUser('${u.Name}',${!u.Enabled})" title="${u.Enabled?'Desactivar':'Activar'}">${u.Enabled?'🔴':'🟢'}</button>
+        <button class="btn btn-secondary btn-xs" onclick="openChangePassModal('${u.Name}')" title="Cambiar contraseña">🔑</button>
+        <button class="btn btn-danger btn-xs" onclick="confirmDeleteUser('${u.Name}')" title="Eliminar">🗑️</button>
+      </div></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function openCreateUserModal() {
+  showModal({icon:'➕',title:'Crear nuevo usuario local',
+    extra:`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div><label class="form-label" style="font-size:.72rem">Nombre de usuario *</label><input id="lu-u" class="form-input" placeholder="usuario" maxlength="20"></div>
+      <div><label class="form-label" style="font-size:.72rem">Nombre completo</label><input id="lu-fn" class="form-input" placeholder="Nombre completo"></div>
+    </div>
+    <div style="margin-bottom:12px"><label class="form-label" style="font-size:.72rem">Descripción</label><input id="lu-desc" class="form-input" placeholder="Descripción del usuario"></div>
+    <div id="lu-ps" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div><label class="form-label" style="font-size:.72rem">Contraseña</label><input id="lu-p1" class="form-input" type="password" placeholder="••••••••"></div>
+      <div><label class="form-label" style="font-size:.72rem">Confirmar</label><input id="lu-p2" class="form-input" type="password" placeholder="••••••••"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.85rem"><input type="checkbox" id="lu-np" style="accent-color:var(--accent)" onchange="document.getElementById('lu-ps').style.display=this.checked?'none':'grid'"> Sin contraseña (cuenta local)</label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.85rem"><input type="checkbox" id="lu-ia" style="accent-color:var(--amber)"> 🔐 Administrador del equipo</label>
+    </div>`,
+    actions:[
+      {label:'Cancelar',cls:'btn-secondary'},
+      {label:'➕ Crear usuario',cls:'btn-primary',action:async()=>{
+        const username=document.getElementById('lu-u').value.trim();
+        const fullname=document.getElementById('lu-fn').value.trim();
+        const description=document.getElementById('lu-desc').value.trim();
+        const p1=document.getElementById('lu-p1').value;
+        const p2=document.getElementById('lu-p2').value;
+        const noPassword=document.getElementById('lu-np').checked;
+        const isAdmin=document.getElementById('lu-ia').checked;
+        if(!username){toast('El nombre de usuario es obligatorio','warn');return;}
+        if(!noPassword&&p1!==p2){toast('Las contraseñas no coinciden','warn');return;}
+        const res=await api.post('/api/local-user-create',{username,fullname,description,isAdmin,noPassword,password:p1});
+        if(res.success){toast('Usuario creado correctamente','success');localUsersLoaded=false;loadLocalUsers();}
+      }}
+    ]
+  });
+}
+
+async function toggleLocalUser(username,enable) {
+  showModal({icon:enable?'🟢':'🔴',title:'Cambiar estado de usuario',desc:`${enable?'Activar':'Desactivar'}: ${username}`,actions:[
+    {label:'Cancelar',cls:'btn-secondary'},
+    {label:'Confirmar',cls:'btn-secondary',action:async()=>{
+      const res=await api.post('/api/local-user-toggle',{username,enable});
+      if(res.success){toast('Estado del usuario actualizado','success');localUsersLoaded=false;loadLocalUsers();}
+    }}
+  ]});
+}
+
+function openChangePassModal(username) {
+  showModal({icon:'🔑',title:`Cambiar contraseña — ${username}`,
+    extra:`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div><label class="form-label" style="font-size:.72rem">Nueva contraseña</label><input id="lu-np1" class="form-input" type="password" placeholder="••••••••"></div>
+      <div><label class="form-label" style="font-size:.72rem">Confirmar</label><input id="lu-np2" class="form-input" type="password" placeholder="••••••••"></div>
+    </div>`,
+    actions:[
+      {label:'Cancelar',cls:'btn-secondary'},
+      {label:'🔑 Cambiar',cls:'btn-primary',action:async()=>{
+        const p1=document.getElementById('lu-np1').value;
+        const p2=document.getElementById('lu-np2').value;
+        if(p1!==p2){toast('Las contraseñas no coinciden','warn');return;}
+        await api.post('/api/local-user-password',{username,password:p1});
+        toast('Contraseña actualizada','success');
+      }}
+    ]
+  });
+}
+
+function confirmDeleteUser(username) {
+  showModal({icon:'🗑️',title:'Eliminar usuario local',desc:`Se eliminará la cuenta "${username}". La carpeta C:\\Users\\${username} no se elimina automáticamente.`,actions:[
+    {label:'Cancelar',cls:'btn-secondary'},
+    {label:'🗑️ Eliminar',cls:'btn-danger',action:async()=>{
+      await api.post('/api/local-user-delete',{username});
+      toast('Usuario eliminado','success');localUsersLoaded=false;loadLocalUsers();
+    }}
+  ]});
+}
+
+/* ════════ MÓDULO 2 — FORMATEO ══════════════════════════════════ */
+let drivesLoaded=false, selectedDrive=null;
+
+async function loadDrives() {
+  drivesLoaded=true;
+  document.getElementById('drives-loading').style.display='flex';
+  document.getElementById('drives-grid').style.display='none';
+  document.getElementById('format-panel').style.display='none';
+  selectedDrive=null;
+  const drives=await api.get('/api/drives');
+  renderDrives(drives);
+  // Populate PST selector
+  const sel=document.getElementById('pst-drive-select');
+  sel.innerHTML='';
+  drives.forEach(d=>{const o=document.createElement('option');o.value=d.Letter;o.textContent=`${d.Letter}: ${d.Label} (${d.TotalDisplay})`;sel.appendChild(o);});
+}
+
+function renderDrives(drives) {
+  document.getElementById('drives-loading').style.display='none';
+  const grid=document.getElementById('drives-grid');
+  grid.style.display='grid'; grid.innerHTML='';
+  drives.forEach(d=>{
+    const fill=usageColor(d.UsedPercent);
+    const locked=d.IsSystem;
+    const card=document.createElement('div');
+    card.className='drive-card'+(locked?' locked':'');
+    card.id='drive-card-'+d.Letter;
+    card.onclick=()=>!locked&&selectDrive(d);
+    card.innerHTML=`
+      ${locked?'<div style="position:absolute;top:12px;right:12px;font-size:.9rem;color:var(--txt3)">🔒</div>':'<div style="position:absolute;top:12px;right:12px"><span class="badge badge-gray">${d.Type}</span></div>'}
+      <div class="drive-letter">${d.Letter}:</div>
+      <div class="drive-label">${d.Label}</div>
+      <div class="drive-usage-bar"><div class="drive-usage-fill" style="width:${d.UsedPercent}%;background:${fill}"></div></div>
+      <div class="drive-meta"><span>Usado: ${d.UsedDisplay}</span><span>${d.UsedPercent}%</span></div>
+      <div class="drive-meta" style="margin-top:2px"><span>Libre: ${d.FreeDisplay}</span><span>Total: ${d.TotalDisplay}</span></div>
+      ${locked?'<div style="margin-top:8px"><span class="badge badge-amber">SISTEMA</span></div>':''}`;
+    grid.appendChild(card);
+  });
+}
+
+function selectDrive(drive) {
+  document.querySelectorAll('.drive-card').forEach(c=>c.classList.remove('selected-drive'));
+  document.getElementById('drive-card-'+drive.Letter).classList.add('selected-drive');
+  selectedDrive=drive;
+  const panel=document.getElementById('format-panel');
+  panel.style.display='block';
+  document.getElementById('format-drive-label').textContent=`${drive.Letter}: — ${drive.Label} (${drive.TotalDisplay})`;
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function closeFormatPanel() {
+  document.getElementById('format-panel').style.display='none';
+  document.querySelectorAll('.drive-card').forEach(c=>c.classList.remove('selected-drive'));
+  selectedDrive=null;
+}
+
+/* ════════ MÓDULO 3 — LIMPIEZA ══════════════════════════════════ */
+let cleanupLoaded=false, cleanupItems=[], cleanupSelected=new Set(), activeCatOrder=0;
+const CAT_ICONS={0:'💻',1:'📋',2:'⚙️',3:'🌐'};
+
+async function loadCleanup() {
+  cleanupLoaded=true; cleanupSelected.clear();
+  document.getElementById('cleanup-loading').style.display='flex';
+  document.getElementById('cleanup-content').style.display='none';
+  cleanupItems=await api.get('/api/cleanup-preview');
+  renderCleanupCategories();
+  renderCleanupPanel(activeCatOrder);
+  document.getElementById('cleanup-loading').style.display='none';
+  document.getElementById('cleanup-content').style.display='block';
+  updateCleanupStats();
+}
+
+function getCategories() {
+  const cats={};
+  cleanupItems.forEach(item=>{
+    if(!cats[item.CatOrder]) cats[item.CatOrder]={order:item.CatOrder,name:item.Category,items:[]};
+    cats[item.CatOrder].items.push(item);
+  });
+  return Object.values(cats).sort((a,b)=>a.order-b.order);
+}
+
+function renderCleanupCategories() {
+  const cats=getCategories();
+  const el=document.getElementById('cleanup-cat-list');
+  el.innerHTML='';
+  cats.forEach(cat=>{
+    const selCount=cat.items.filter(i=>cleanupSelected.has(i.Id)).length;
+    const div=document.createElement('div');
+    div.className='cleanup-cat-item'+(cat.order===activeCatOrder?' active':'');
+    div.onclick=()=>{activeCatOrder=cat.order;renderCleanupCategories();renderCleanupPanel(cat.order);};
+    div.innerHTML=`<span class="cleanup-cat-icon">${CAT_ICONS[cat.order]||'📦'}</span><span>${cat.name}</span><span class="cleanup-cat-count">${selCount>0?selCount+'/':''}${cat.items.length}</span>`;
+    el.appendChild(div);
+  });
+}
+
+function renderCleanupPanel(catOrder) {
+  const cats=getCategories();
+  const cat=cats.find(c=>c.order===catOrder);
+  if(!cat) return;
+  document.getElementById('cleanup-panel-title').innerHTML=`${CAT_ICONS[catOrder]||'📦'} ${cat.name}`;
+  document.getElementById('cleanup-select-all').checked=cat.items.every(i=>cleanupSelected.has(i.Id));
+  const list=document.getElementById('cleanup-list');
+  list.innerHTML='';
+  cat.items.forEach(item=>{
+    const checked=cleanupSelected.has(item.Id);
+    const row=document.createElement('div');
+    row.className='cleanup-check-row'+(checked?' checked':'');
+    row.id='cleanrow-'+item.Id;
+    row.onclick=(e)=>{if(e.target.tagName==='INPUT')return;const cb=row.querySelector('input');cb.checked=!cb.checked;toggleCleanupItem(item.Id,cb.checked);};
+    row.innerHTML=`
+      <input type="checkbox" ${checked?'checked':''} onchange="toggleCleanupItem('${item.Id}',this.checked)">
+      <div class="cleanup-row-info"><div class="cleanup-row-name">${item.Name}</div><div class="cleanup-row-path">${item.Path||'—'}</div></div>
+      <div class="cleanup-row-admin">${item.RequiresAdmin?'<span class="badge badge-amber" style="font-size:.65rem">🔐</span>':'<span class="badge badge-green" style="font-size:.65rem">🔓</span>'}</div>
+      <div class="cleanup-row-size" id="csize-${item.Id}">${item.SizeBytes>0?item.SizeDisplay:'<span style="color:var(--txt3)">—</span>'}</div>`;
+    list.appendChild(row);
+  });
+}
+
+function toggleCleanupItem(id,checked) {
+  checked?cleanupSelected.add(id):cleanupSelected.delete(id);
+  document.getElementById('cleanrow-'+id)?.classList.toggle('checked',checked);
+  updateCleanupStats();
+  renderCleanupCategories();
+}
+function toggleAllCleanupCat(checked) {
+  const cat=getCategories().find(c=>c.order===activeCatOrder);
+  if(!cat) return;
+  cat.items.forEach(item=>checked?cleanupSelected.add(item.Id):cleanupSelected.delete(item.Id));
+  renderCleanupPanel(activeCatOrder);
+  renderCleanupCategories();
+  updateCleanupStats();
+}
+function updateCleanupStats() {
+  let selSize=0,totSize=0;
+  cleanupSelected.forEach(id=>{const item=cleanupItems.find(i=>i.Id===id);if(item&&item.SizeBytes>0)selSize+=item.SizeBytes;});
+  cleanupItems.forEach(item=>{if(item.SizeBytes>0)totSize+=item.SizeBytes;});
+  document.getElementById('cleanup-selected-count').textContent=cleanupSelected.size;
+  document.getElementById('cleanup-selected-size').textContent=formatBytes(selSize);
+  document.getElementById('cleanup-total-size').textContent=totSize>0?formatBytes(totSize):'...';
+  document.getElementById('cleanup-execute-btn').disabled=cleanupSelected.size===0;
+}
+async function executeCleanup() {
+  const items=Array.from(cleanupSelected);
+  if(!items.length){toast('No hay elementos seleccionados','warn');return;}
+  showModal({icon:'🧹',title:'Confirmar limpieza',desc:`Se limpiarán ${items.length} elementos seleccionados. Algunas operaciones requieren UAC.`,actions:[
+    {label:'Cancelar',cls:'btn-secondary'},
+    {label:'🧹 Limpiar',cls:'btn-success',action:async()=>{
+      await api.post('/api/cleanup',{items});
+      toast('Limpieza completada correctamente','success');
+      cleanupLoaded=false;cleanupSelected.clear();loadCleanup();
+    }}
+  ]});
+}
+
+/* ════════ MÓDULO 4 — PST ═══════════════════════════════════════ */
+let pstResults=[];
+
+async function scanPst() {
+  const drive=document.getElementById('pst-drive-select').value;
+  const btn=document.getElementById('pst-scan-btn');
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner spinner-sm" style="display:inline-block"></div> Buscando...';
+  document.getElementById('pst-loading').style.display='flex';
+  document.getElementById('pst-results').style.display='none';
+  pstResults=await api.get(`/api/scan-pst?drive=${drive}`);
+  document.getElementById('pst-loading').style.display='none';
+  document.getElementById('pst-results').style.display='block';
+  document.getElementById('pst-count').textContent=pstResults.length;
+  document.getElementById('pst-empty').style.display=pstResults.length?'none':'flex';
+  const wrap=document.getElementById('pst-table-wrap');
+  wrap.style.display=pstResults.length?'block':'none';
+  if(pstResults.length) {
+    const tbody=document.getElementById('pst-tbody');
+    tbody.innerHTML='';
+    pstResults.forEach((f,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td><input type="checkbox" data-idx="${i}" style="accent-color:var(--accent)" onchange="updatePstCopyBar()"></td>
+        <td style="font-weight:600">📧 ${f.Name}</td>
+        <td class="mono" style="font-size:.75rem;color:var(--txt2);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${f.Path}">${f.Path}</td>
+        <td class="mono">${f.SizeDisplay}</td>
+        <td class="mono" style="color:var(--txt3)">${f.LastModified}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  updatePstCopyBar();
+  btn.disabled=false;btn.innerHTML='🔍 Buscar archivos .pst';
+}
+
+function toggleAllPst(checked) {
+  document.querySelectorAll('#pst-tbody input[type=checkbox]').forEach(cb=>cb.checked=checked);
+  updatePstCopyBar();
+}
+function updatePstCopyBar() {
+  const count=document.querySelectorAll('#pst-tbody input[type=checkbox]:checked').length;
+  document.getElementById('pst-copy-bar').style.display=count>0?'flex':'none';
+}
+async function copyPst() {
+  const dest=document.getElementById('pst-dest').value.trim();
+  if(!dest){toast('Indica la carpeta destino','warn');return;}
+  const files=Array.from(document.querySelectorAll('#pst-tbody input[type=checkbox]:checked')).map(cb=>pstResults[parseInt(cb.getAttribute('data-idx'))].Path);
+  showModal({icon:'📋',title:'Copiar archivos .pst',desc:`Se copiarán ${files.length} archivo(s) a ${dest}`,actions:[
+    {label:'Cancelar',cls:'btn-secondary'},
+    {label:'📋 Copiar',cls:'btn-success',action:async()=>{
+      await api.post('/api/copy-pst',{files,destination:dest});
+      toast(`${files.length} archivo(s) copiados correctamente`,'success');
+    }}
+  ]});
+}
+
+/* ════════ INIT ════════════════════════════════════════════════ */
+/* ════════ MÓDULO 5 — RED ════════════════════════════════════ */
+let networkLoaded=false;
+
+async function loadNetwork() {
+  networkLoaded=true;
+  document.getElementById('net-loading').style.display='flex';
+  document.getElementById('net-adapters-grid').style.display='none';
+  document.getElementById('ping-panel').style.display='none';
+  const adapters=await api.get('/api/network');
+  renderAdapters(adapters);
+}
+
+function renderAdapters(adapters) {
+  document.getElementById('net-loading').style.display='none';
+  const grid=document.getElementById('net-adapters-grid');
+  grid.style.display='grid'; grid.innerHTML='';
+  adapters.forEach(a=>{
+    const isUp=a.Status==='Up';
+    const card=document.createElement('div');
+    card.className='net-adapter-card '+(isUp?'connected':'disconnected');
+    const dhcpBadge=a.DhcpEnabled?`<span class="badge badge-blue">DHCP</span>`:`<span class="badge badge-gray">Estática</span>`;
+    const statusBadge=isUp?`<span class="badge badge-green">🟢 Conectado</span>`:`<span class="badge badge-gray">⚫ Desconectado</span>`;
+    const speedDisplay=a.LinkSpeedMbps>0?(a.LinkSpeedMbps>=1000?(a.LinkSpeedMbps/1000)+' Gbps':a.LinkSpeedMbps+' Mbps'):'—';
+    const gwEsc=(a.Gateway||'').replace(/'/g,"\\'");
+    card.innerHTML=`
+      <div class="net-adapter-header">
+        <div style="min-width:0"><div class="net-adapter-name">📡 ${a.Name}</div><div class="net-adapter-desc">${a.Description}</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">${statusBadge}${dhcpBadge}</div>
+      </div>
+      <div class="net-adapter-body">
+        <div class="net-field"><span class="net-field-label">IPv4</span><span class="net-field-value highlight">${a.IPAddress||'—'}</span></div>
+        <div class="net-field"><span class="net-field-label">Máscara</span><span class="net-field-value">${a.SubnetMask||'—'}</span></div>
+        <div class="net-field"><span class="net-field-label">Gateway</span><span class="net-field-value">${a.Gateway||'—'}</span></div>
+        <div class="net-field"><span class="net-field-label">DNS</span><span class="net-field-value">${(a.DnsServers&&a.DnsServers.length)?a.DnsServers.join('<br>'):'—'}</span></div>
+        <div class="net-field"><span class="net-field-label">MAC</span><span class="net-field-value">${a.MacAddress||'—'}</span></div>
+        <div class="net-field"><span class="net-field-label">Velocidad</span><span class="net-field-value">${speedDisplay}</span></div>
+      </div>
+      ${isUp?`<div class="net-adapter-actions">
+        <button class="btn btn-secondary btn-xs" onclick="releaseIp('${a.Name.replace(/'/g,"\\'")}')">📤 Liberar IP</button>
+        <button class="btn btn-secondary btn-xs" onclick="renewIp('${a.Name.replace(/'/g,"\\'")}')">🔄 Renovar IP</button>
+        ${a.Gateway?`<button class="btn btn-secondary btn-xs" onclick="openPingFor('${gwEsc}')">🔍 Ping gateway</button>`:''}
+      </div>`:''}`;
+    grid.appendChild(card);
+  });
+  document.getElementById('ping-panel').style.display='block';
+}
+
+async function flushDns() {
+  await api.post('/api/flush-dns',{});
+  toast('Caché DNS vaciada correctamente','success');
+}
+async function releaseIp(name) {
+  showModal({icon:'📤',title:'Liberar IP',desc:`Se liberará la IP del adaptador "${name}". Perderá conectividad hasta renovar.`,actions:[
+    {label:'Cancelar',cls:'btn-secondary'},
+    {label:'📤 Liberar',cls:'btn-danger',action:async()=>{
+      await api.post('/api/release-ip',{adapter:name});
+      toast('IP liberada correctamente','success');
+      networkLoaded=false; loadNetwork();
+    }}
+  ]});
+}
+async function renewIp(name) {
+  showModal({icon:'🔄',title:'Renovar IP',desc:`Se solicitará nueva IP al servidor DHCP — "${name}".`,actions:[
+    {label:'Cancelar',cls:'btn-secondary'},
+    {label:'🔄 Renovar',cls:'btn-secondary',action:async()=>{
+      await api.post('/api/renew-ip',{adapter:name});
+      toast('IP renovada correctamente','success');
+      networkLoaded=false; loadNetwork();
+    }}
+  ]});
+}
+
+let pingRunning=false;
+function openPingFor(host) {
+  if(!host) return;
+  document.getElementById('ping-host').value=host;
+  document.getElementById('ping-panel').scrollIntoView({behavior:'smooth'});
+  doPing();
+}
+async function doPing() {
+  if(pingRunning) return;
+  const host=document.getElementById('ping-host').value.trim();
+  if(!host){toast('Indica un host o IP','warn');return;}
+  const count=parseInt(document.getElementById('ping-count').value)||4;
+  pingRunning=true;
+  const btn=document.getElementById('ping-btn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner spinner-sm" style="display:inline-block"></div> Pinging...';
+  const wrap=document.getElementById('ping-results-wrap');
+  const body=document.getElementById('ping-results-body');
+  const summary=document.getElementById('ping-summary');
+  wrap.style.display='block'; body.innerHTML=''; summary.innerHTML='';
+  try {
+    const res=await api.post('/api/ping',{host,count});
+    const results=res.results||[];
+    results.forEach(r=>{
+      const row=document.createElement('div'); row.className='ping-row';
+      let msClass='timeout',msText='Timeout';
+      if(r.Success){const ms=r.Latency;msClass=ms<20?'fast':ms<80?'ok':'slow';msText=ms+' ms';}
+      row.innerHTML=`<span class="ping-seq">#${r.Seq}</span><span class="ping-host">${r.Address||host}</span><span class="ping-ms ${msClass}">${msText}</span><span class="ping-status">${r.Success?'OK':'TIMEOUT'}</span>`;
+      body.appendChild(row);
+    });
+    const sent=results.length,recv=results.filter(r=>r.Success).length,lost=sent-recv;
+    const lats=results.filter(r=>r.Success).map(r=>r.Latency);
+    const avg=lats.length?Math.round(lats.reduce((a,b)=>a+b,0)/lats.length):0;
+    const minL=lats.length?Math.min(...lats):0,maxL=lats.length?Math.max(...lats):0;
+    summary.innerHTML=`
+      <div class="ping-summary-item"><span class="ping-summary-label">Enviados</span><span class="ping-summary-val">${sent}</span></div>
+      <div class="ping-summary-item"><span class="ping-summary-label">Recibidos</span><span class="ping-summary-val" style="color:var(--green)">${recv}</span></div>
+      <div class="ping-summary-item"><span class="ping-summary-label">Perdidos</span><span class="ping-summary-val" style="color:${lost>0?'var(--red)':'var(--txt3)'}">${lost} (${sent?Math.round(lost/sent*100):0}%)</span></div>
+      <div class="ping-summary-item"><span class="ping-summary-label">Media</span><span class="ping-summary-val" style="color:var(--accent)">${recv?avg+' ms':'—'}</span></div>
+      <div class="ping-summary-item"><span class="ping-summary-label">Min / Max</span><span class="ping-summary-val">${recv?minL+' / '+maxL+' ms':'—'}</span></div>`;
+  } catch(e) {
+    body.innerHTML=`<div class="ping-row"><span style="color:var(--red)">❌ Error: ${e.message}</span></div>`;
+  } finally {
+    pingRunning=false; btn.disabled=false; btn.innerHTML='▶ Ping';
+  }
+}
+function clearPing() {
+  document.getElementById('ping-results-wrap').style.display='none';
+  document.getElementById('ping-host').value='';
+}
+
+/* ════════ MOCK PERF GENERATOR ═════════════════════════════ */
+let _simCpu = 25, _simRam = 62;
+const MOCK_PROCS = [
+  'chrome','svchost','explorer','msedge','Teams','Outlook','OneDrive',
+  'SearchIndexer','WmiPrvSE','RuntimeBroker','MsMpEng','spoolsv','lsass','csrss','dwm'
+];
+function genPerfSnap() {
+  _simCpu = Math.max(2, Math.min(98, _simCpu + (Math.random()-0.45)*8));
+  _simRam = Math.max(30, Math.min(92, _simRam + (Math.random()-0.5)*2));
+  const ramTot = 16, ramUsed = ramTot * _simRam/100;
+  return {
+    CpuPct: Math.round(_simCpu*10)/10,
+    CpuName: 'Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz',
+    CpuCores: 8, CpuLogical: 16, CpuFreqMhz: 2900,
+    RamTotalGB: ramTot, RamUsedGB: Math.round(ramUsed*100)/100,
+    RamFreeGB:  Math.round((ramTot-ramUsed)*100)/100,
+    ModifiedGB: Math.round(ramUsed*0.08*100)/100,
+    StandbyGB:  Math.round(ramUsed*0.15*100)/100,
+    RamUsedPct: Math.round(_simRam*10)/10,
+    UptimeDisplay: '3d 14h 22m',
+    ProcessCount: 187 + Math.floor(Math.random()*10),
+    ThreadCount:  2840 + Math.floor(Math.random()*50),
+    HandleCount:  98200 + Math.floor(Math.random()*500),
+    Disks: [
+      {Name:'Disco 0 C: NVMe',Letter:'C:',ReadBytesPerSec:Math.floor(Math.random()*5000000),WriteBytesPerSec:Math.floor(Math.random()*2000000),ReadPct:Math.floor(Math.random()*40),WritePct:Math.floor(Math.random()*20)},
+      {Name:'Disco 1 D: HDD', Letter:'D:',ReadBytesPerSec:Math.floor(Math.random()*800000), WriteBytesPerSec:Math.floor(Math.random()*300000), ReadPct:Math.floor(Math.random()*15),WritePct:Math.floor(Math.random()*8)},
+    ],
+    TopProcesses: MOCK_PROCS.map((name,i) => ({
+      Name: name, Id: 1000+i*100,
+      CpuPct: Math.max(0, (i===0?_simCpu*0.35:Math.random()*(15-i*0.5))),
+      WorkingSetMB: 50+Math.random()*400
+    })).sort((a,b)=>b.CpuPct-a.CpuPct)
+  };
+}
+
+/* ════════ MÓDULO 6 — MONITOR ════════════════════════════════ */
+let perfStarted=false, perfPaused=false, perfInterval=null, perfIntervalMs=2000, perfStaticDone=false;
+const CHART_MAX=60;
+const perfHistory={cpu:[],ram:[]};
+
+function drawLineChart(canvasId, data, color, maxVal) {
+  const canvas=document.getElementById(canvasId);
+  if(!canvas) return;
+  const dpr=window.devicePixelRatio||1;
+  const rect=canvas.getBoundingClientRect();
+  if(rect.width===0) return;
+  canvas.width=rect.width*dpr; canvas.height=rect.height*dpr;
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  const W=rect.width, H=rect.height;
+  ctx.strokeStyle='rgba(28,45,61,0.6)'; ctx.lineWidth=1;
+  [25,50,75].forEach(p=>{const y=H-(p/maxVal)*H;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();});
+  if(data.length<2) return;
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  const rgb=color.match(/\d+/g);
+  grad.addColorStop(0,`rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.35)`);
+  grad.addColorStop(1,`rgba(${rgb[0]},${rgb[1]},${rgb[2]},0)`);
+  const stepX=W/(CHART_MAX-1);
+  ctx.beginPath();
+  data.forEach((v,i)=>{const x=(CHART_MAX-data.length+i)*stepX;const y=H-Math.min(v/maxVal,1)*H;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  const lastX=(CHART_MAX-1)*stepX;
+  ctx.lineTo(lastX,H);ctx.lineTo((CHART_MAX-data.length)*stepX,H);ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();
+  data.forEach((v,i)=>{const x=(CHART_MAX-data.length+i)*stepX;const y=H-Math.min(v/maxVal,1)*H;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+}
+
+function updateArc(arcId,txtId,pct,color) {
+  const arc=document.getElementById(arcId);
+  const txt=document.getElementById(txtId);
+  if(!arc||!txt) return;
+  const total=204;
+  arc.style.strokeDashoffset=total-(pct/100)*total;
+  arc.style.stroke=color;
+  txt.textContent=Math.round(pct)+'%';
+  txt.setAttribute('fill',color);
+}
+
+function pctColor(pct) {
+  if(pct<60) return 'rgb(0,229,255)';
+  if(pct<80) return 'rgb(255,179,0)';
+  return 'rgb(255,68,68)';
+}
+
+function renderRamBar(d) {
+  const seg=document.getElementById('ram-segments');
+  const leg=document.getElementById('ram-legend');
+  if(!seg||!leg) return;
+  const tot=d.RamTotalGB;
+  const items=[
+    {label:'En uso',    gb:d.RamUsedGB,  color:'#00e5ff'},
+    {label:'Modificada',gb:d.ModifiedGB, color:'#a855f7'},
+    {label:'En espera', gb:d.StandbyGB,  color:'#2a4060'},
+    {label:'Libre',     gb:d.RamFreeGB,  color:'#1c2d3d'},
+  ];
+  seg.innerHTML=items.map(it=>`<div class="ram-seg" style="width:${(it.gb/tot*100).toFixed(1)}%;background:${it.color}"></div>`).join('');
+  leg.innerHTML=items.map(it=>`<div class="ram-legend-item"><div class="ram-legend-dot" style="background:${it.color}"></div>${it.label}: ${Number(it.gb).toFixed(1)} GB</div>`).join('');
+}
+
+function renderDiskIO(disks) {
+  const grid=document.getElementById('perf-disk-grid');
+  if(!grid||!disks||!disks.length) return;
+  function fmtBps(b){b=Number(b);if(b>=1048576)return(b/1048576).toFixed(1)+' MB/s';if(b>=1024)return(b/1024).toFixed(0)+' KB/s';return b+' B/s';}
+  grid.innerHTML=disks.map(d=>`<div class="disk-io-card">
+    <div class="disk-io-name">💾 ${d.Name} <span class="badge badge-gray" style="font-size:.65rem">${d.Letter||''}</span></div>
+    <div class="disk-io-row"><span class="disk-io-label">Lectura</span><span class="disk-io-val read">${fmtBps(d.ReadBytesPerSec)}</span></div>
+    <div style="height:4px;border-radius:2px;background:var(--border);overflow:hidden;margin-bottom:8px"><div style="height:100%;border-radius:2px;background:var(--accent);width:${Math.min(d.ReadPct||0,100)}%;transition:width .4s ease"></div></div>
+    <div class="disk-io-row"><span class="disk-io-label">Escritura</span><span class="disk-io-val write">${fmtBps(d.WriteBytesPerSec)}</span></div>
+    <div style="height:4px;border-radius:2px;background:var(--border);overflow:hidden"><div style="height:100%;border-radius:2px;background:var(--amber);width:${Math.min(d.WritePct||0,100)}%;transition:width .4s ease"></div></div>
+  </div>`).join('');
+}
+
+function renderProcesses(procs) {
+  const list=document.getElementById('perf-proc-list');
+  if(!list) return;
+  list.innerHTML='';
+  const maxCpu=procs.length?Math.max(procs[0].CpuPct,0.1):1;
+  procs.slice(0,15).forEach(p=>{
+    const pct=p.CpuPct/maxCpu*100;
+    const color=p.CpuPct>20?'var(--red)':p.CpuPct>5?'var(--amber)':'var(--accent)';
+    const row=document.createElement('div');row.className='perf-proc-row';
+    row.innerHTML=`
+      <div class="perf-proc-name" title="${p.Name}">${p.Name}</div>
+      <div class="perf-proc-val" style="color:${color}">${Number(p.CpuPct).toFixed(1)}%</div>
+      <div class="perf-proc-val">${Number(p.WorkingSetMB).toFixed(0)}</div>
+      <div class="perf-proc-val" style="color:var(--txt3)">${p.Id}</div>
+      <div class="perf-proc-bar-cell"><div class="perf-proc-bar"><div class="perf-proc-bar-fill" style="width:${pct.toFixed(0)}%;background:${color}"></div></div></div>`;
+    list.appendChild(row);
+  });
+}
+
+async function perfTick() {
+  if(perfPaused) return;
+  const d=await api.get('/api/perf');
+  if(d.error) return;
+  if(document.getElementById('perf-loading').style.display!=='none'){
+    document.getElementById('perf-loading').style.display='none';
+    document.getElementById('perf-content').style.display='block';
+  }
+  if(!perfStaticDone&&d.CpuName){
+    document.getElementById('perf-cpu-name').textContent=d.CpuName;
+    document.getElementById('perf-cpu-cores').textContent=d.CpuCores+' cores / '+d.CpuLogical+' lógicos';
+    perfStaticDone=true;
+  }
+  const cpu=d.CpuPct||0;
+  perfHistory.cpu.push(cpu);
+  if(perfHistory.cpu.length>CHART_MAX) perfHistory.cpu.shift();
+  document.getElementById('perf-cpu-pct').textContent=cpu.toFixed(1)+'%';
+  document.getElementById('perf-cpu-pct').style.color=pctColor(cpu);
+  document.getElementById('perf-cpu-sub').textContent=d.CpuFreqMhz?d.CpuFreqMhz+' MHz':'';
+  updateArc('cpu-arc','cpu-gauge-txt',cpu,pctColor(cpu));
+  drawLineChart('chart-cpu',perfHistory.cpu,pctColor(cpu),100);
+  const rp=d.RamUsedPct||0;
+  perfHistory.ram.push(rp);
+  if(perfHistory.ram.length>CHART_MAX) perfHistory.ram.shift();
+  document.getElementById('perf-ram-pct').textContent=rp.toFixed(1)+'%';
+  document.getElementById('perf-ram-pct').style.color=pctColor(rp);
+  document.getElementById('perf-ram-sub').textContent=d.RamUsedGB.toFixed(1)+' / '+d.RamTotalGB.toFixed(1)+' GB';
+  drawLineChart('chart-ram',perfHistory.ram,pctColor(rp),100);
+  renderRamBar(d);
+  document.getElementById('perf-uptime').textContent=d.UptimeDisplay||'—';
+  document.getElementById('perf-proc-count').textContent=d.ProcessCount||'—';
+  document.getElementById('perf-thread-count').textContent=d.ThreadCount||'—';
+  document.getElementById('perf-handle-count').textContent=d.HandleCount||'—';
+  renderDiskIO(d.Disks||[]);
+  if(d.TopProcesses&&d.TopProcesses.length) renderProcesses(d.TopProcesses);
+}
+
+function startPerf() {
+  perfStarted=true;perfPaused=false;
+  perfHistory.cpu=[];perfHistory.ram=[];perfStaticDone=false;
+  document.getElementById('perf-loading').style.display='flex';
+  document.getElementById('perf-content').style.display='none';
+  perfTick();
+  perfInterval=setInterval(perfTick,perfIntervalMs);
+}
+function togglePerfPause() {
+  perfPaused=!perfPaused;
+  const btn=document.getElementById('perf-pause-btn');
+  const dot=document.querySelector('.perf-live-dot');
+  const lbl=document.querySelector('#perf-live-indicator span');
+  if(perfPaused){btn.innerHTML='▶ Reanudar';dot.classList.add('paused');if(lbl)lbl.textContent='Pausado';}
+  else{btn.innerHTML='⏸ Pausar';dot.classList.remove('paused');if(lbl)lbl.textContent='En vivo';perfTick();}
+}
+function changePerfInterval() {
+  perfIntervalMs=parseInt(document.getElementById('perf-interval').value)||2000;
+  if(perfInterval){clearInterval(perfInterval);perfInterval=null;}
+  if(!perfPaused&&perfStarted) perfInterval=setInterval(perfTick,perfIntervalMs);
+}
+
+// Stop polling when leaving perf section
+/* ════════ MÓDULO 7 — SERVICIOS ════════════════════════════ */
+let svcLoaded=false, svcAll=[], svcFiltered=[], svcFilter='all';
+let svcSortCol='DisplayName', svcSortDir=1;
+
+async function loadServices() {
+  svcLoaded=true;
+  document.getElementById('svc-loading').style.display='flex';
+  document.getElementById('svc-table-wrap').style.display='none';
+  svcAll=await api.get('/api/services');
+  applyServicesFilter();
+  document.getElementById('svc-loading').style.display='none';
+  document.getElementById('svc-table-wrap').style.display='block';
+}
+
+function setSvcFilter(f) {
+  svcFilter=f;
+  document.querySelectorAll('.svc-filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f));
+  applyServicesFilter();
+}
+function filterServices(){ applyServicesFilter(); }
+
+function applyServicesFilter() {
+  const q=(document.getElementById('svc-search')?.value||'').toLowerCase();
+  let list=svcAll;
+  if(svcFilter==='running') list=list.filter(s=>s.Status==='Running');
+  else if(svcFilter==='stopped') list=list.filter(s=>s.Status==='Stopped');
+  else if(svcFilter==='auto') list=list.filter(s=>s.StartType==='Automatic');
+  if(q) list=list.filter(s=>s.DisplayName.toLowerCase().includes(q)||s.Name.toLowerCase().includes(q)||(s.Description||'').toLowerCase().includes(q));
+  list=[...list].sort((a,b)=>{
+    const av=(a[svcSortCol]||'').toLowerCase(), bv=(b[svcSortCol]||'').toLowerCase();
+    return av<bv?-svcSortDir:av>bv?svcSortDir:0;
+  });
+  svcFiltered=list;
+  renderServicesTable();
+  updateSvcStats();
+}
+
+function sortSvc(col) {
+  if(svcSortCol===col) svcSortDir*=-1; else{svcSortCol=col;svcSortDir=1;}
+  document.querySelectorAll('.svc-table th').forEach(th=>{
+    const c=th.dataset.col; if(!c) return;
+    const icon=document.getElementById('svc-sort-'+c);
+    if(icon){th.classList.toggle('sorted',c===svcSortCol);icon.textContent=c===svcSortCol?(svcSortDir===1?'↑':'↓'):'↕';}
+  });
+  applyServicesFilter();
+}
+
+function updateSvcStats() {
+  const running=svcAll.filter(s=>s.Status==='Running').length;
+  const stopped=svcAll.filter(s=>s.Status==='Stopped').length;
+  const disabled=svcAll.filter(s=>s.StartType==='Disabled').length;
+  document.getElementById('svc-stats').innerHTML=`
+    <div class="svc-stats-item"><div class="svc-stats-dot" style="background:var(--green)"></div>${running} En ejecución</div>
+    <div class="svc-stats-item"><div class="svc-stats-dot" style="background:var(--red)"></div>${stopped} Detenidos</div>
+    <div class="svc-stats-item"><div class="svc-stats-dot" style="background:var(--txt3)"></div>${disabled} Deshabilitados</div>`;
+}
+
+function escHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function renderServicesTable() {
+  const tbody=document.getElementById('svc-tbody');
+  const footer=document.getElementById('svc-footer');
+  if(!tbody) return;
+  if(!svcFiltered.length){
+    tbody.innerHTML=`<tr class="svc-empty-row"><td colspan="5">🔍 No se encontraron servicios</td></tr>`;
+    if(footer) footer.textContent=''; return;
+  }
+  tbody.innerHTML=svcFiltered.map(s=>{
+    const statusCls=s.Status==='Running'?'running':s.Status==='Stopped'?'stopped':s.Status==='Paused'?'paused':'other';
+    const statusLabel=s.Status==='Running'?'En ejecución':s.Status==='Stopped'?'Detenido':s.Status==='Paused'?'Pausado':s.Status;
+    const statusDot=s.Status==='Running'?'🟢':s.Status==='Stopped'?'🔴':'🟡';
+    const startCls=s.StartType==='Automatic'?'auto':s.StartType==='Manual'?'manual':s.StartType==='Disabled'?'disabled':'';
+    const startLabel=s.StartType==='Automatic'?'Automático':s.StartType==='Manual'?'Manual':s.StartType==='Disabled'?'Deshabilitado':s.StartType;
+    const isRunning=s.Status==='Running';
+    const nm=s.Name.replace(/'/g,"\\'");
+    return `<tr>
+      <td><div class="svc-name">${escHtml(s.DisplayName)}</div><div class="svc-desc" title="${escHtml(s.Description||'')}">${escHtml(s.Description||s.Name)}</div></td>
+      <td><span class="svc-status ${statusCls}">${statusDot} ${statusLabel}</span></td>
+      <td><span class="svc-start ${startCls}">${startLabel}</span></td>
+      <td><div class="svc-actions">
+        <button class="svc-btn svc-btn-start"   ${isRunning?'disabled':''} onclick="svcAction('${nm}','start')">▶ Iniciar</button>
+        <button class="svc-btn svc-btn-stop"    ${!isRunning?'disabled':''} onclick="svcAction('${nm}','stop')">⏹ Detener</button>
+        <button class="svc-btn svc-btn-restart" ${!isRunning?'disabled':''} onclick="svcAction('${nm}','restart')">🔄</button>
+      </div></td>
+      <td><select class="svc-start-select" onchange="svcSetStartup('${nm}',this.value)">
+        <option value="Automatic" ${s.StartType==='Automatic'?'selected':''}>Automático</option>
+        <option value="Manual"    ${s.StartType==='Manual'?'selected':''}>Manual</option>
+        <option value="Disabled"  ${s.StartType==='Disabled'?'selected':''}>Deshabilitado</option>
+      </select></td>
+    </tr>`;
+  }).join('');
+  if(footer) footer.textContent=`Mostrando ${svcFiltered.length} de ${svcAll.length} servicios`;
+}
+
+function svcAction(name, action) {
+  const title=action==='stop'?'Detener servicio':action==='restart'?'Reiniciar servicio':'Iniciar servicio';
+  const desc=action==='stop'?'Detener este servicio puede afectar al funcionamiento del sistema.':action==='restart'?'El servicio se detendrá y volverá a iniciarse.':'';
+  const icon=action==='stop'?'⏹':action==='restart'?'🔄':'▶';
+  showModal({icon,title:title+': '+name,desc,actions:[
+    {label:'Cancelar',cls:'btn-secondary'},
+    {label:icon+' '+title,cls:action==='stop'?'btn-danger':'btn-secondary',action:async()=>{
+      const res=await api.post('/api/service-action',{name,action});
+      if(res.success){
+        toast('Operación completada ('+name+')','success');
+        const svc=svcAll.find(s=>s.Name===name);
+        if(svc){if(action==='start'||action==='restart')svc.Status='Running';else if(action==='stop')svc.Status='Stopped';}
+        applyServicesFilter();
+      } else toast(res.error||'Error','error');
+    }}
+  ]});
+}
+
+async function svcSetStartup(name, startType) {
+  const res=await api.post('/api/service-startup',{name,startType});
+  if(res.success){
+    toast('Tipo de arranque actualizado → '+startType,'success');
+    const svc=svcAll.find(s=>s.Name===name);
+    if(svc) svc.StartType=startType;
+    applyServicesFilter();
+  } else { toast(res.error||'Error','error'); applyServicesFilter(); }
+}
+
+window.onload=()=>{ loadUsers(); };
+</script>
+</body>
+</html>

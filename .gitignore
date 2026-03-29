@@ -1,0 +1,18 @@
+# Logs generados por la app
+winadmin_debug.log
+server_debug.log
+*.log
+
+# Progreso de copia temporal
+mantendu_copy_progress.json
+
+# Carpeta de despliegue local (no versionar)
+C:\WinAdminTool\
+
+# Windows
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# VS Code
+.vscode/

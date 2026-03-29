@@ -1,0 +1,8 @@
+módulos futuros que encajarían perfectamente:
+
+🔧 Gestión de servicios Windows (iniciar/detener/deshabilitar)
+📊 Monitor de rendimiento (CPU, RAM, disco en tiempo real)
+🌐 Información de red (IP, DNS, adaptadores, flush DNS)
+🔑 Gestión de usuarios locales (crear, deshabilitar, cambiar contraseña)
+📋 Visor de Event Viewer filtrado (errores críticos del sistema)
+🖨️ Gestión de impresoras y colas de impresión
