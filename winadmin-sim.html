@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WinAdmin Tool — Simulación</title>
+<title>Mantendu — Simulación</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -315,7 +315,7 @@ td{padding:10px 14px;vertical-align:middle}
 .svc-search:focus{border-color:var(--accent)}
 .svc-filter-group{display:flex;gap:6px;flex-wrap:wrap}
 .svc-filter-btn{padding:6px 14px;border-radius:var(--radius);background:var(--card2);border:1px solid var(--border2);color:var(--txt3);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s}
-.svc-filter-btn.active{background:rgba(0,229,255,.12);border-color:var(--accent);color:var(--accent)}
+.svc-filter-btn.active{background:var(--accent);color:#000;border-color:var(--accent)}
 .svc-stats{font-size:.75rem;font-family:var(--font-mono);color:var(--txt3);display:flex;gap:12px;flex-wrap:wrap;padding:0 2px}
 .svc-stats-item{display:flex;align-items:center;gap:5px}
 .svc-stats-dot{width:7px;height:7px;border-radius:50%}
@@ -352,6 +352,60 @@ td{padding:10px 14px;vertical-align:middle}
 .svc-start-select{padding:4px 8px;background:var(--card2);border:1px solid var(--border2);border-radius:4px;color:var(--txt2);font-size:.75rem;outline:none;cursor:pointer}
 .svc-start-select:focus{border-color:var(--accent)}
 .svc-empty-row td{text-align:center;padding:40px;color:var(--txt3)}
+
+/* EVENT VIEWER */
+.ev-layout{display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:start}
+@media(max-width:800px){.ev-layout{grid-template-columns:1fr}}
+.ev-sources{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:sticky;top:16px}
+.ev-source-item{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;border-left:3px solid transparent;transition:background .12s,border-color .12s;user-select:none}
+.ev-source-item:hover{background:var(--hover)}
+.ev-source-item.active{background:rgba(0,229,255,.07);border-left-color:var(--accent)}
+.ev-source-icon{font-size:1rem;flex-shrink:0}
+.ev-source-label{font-size:.8rem;font-weight:600;color:var(--txt);flex:1}
+.ev-source-count{font-size:.68rem;font-family:var(--font-mono);background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:1px 7px;color:var(--txt3)}
+.ev-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.ev-range-btn{padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;background:var(--card2);border:1px solid var(--border2);color:var(--txt2);cursor:pointer;transition:all .12s}
+.ev-range-btn:hover{background:var(--hover);color:var(--txt)}
+.ev-range-btn.active{background:rgba(0,229,255,.12);border-color:var(--accent);color:var(--accent)}
+.ev-level-filter{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ev-level-chip{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;cursor:pointer;user-select:none;border:1px solid transparent;transition:opacity .12s}
+.ev-level-chip.inactive{opacity:.35}
+.ev-search{flex:1;min-width:180px;padding:6px 12px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--txt);font-size:.82rem;outline:none;transition:border-color .2s}
+.ev-search:focus{border-color:var(--accent)}
+.ev-table-wrap{overflow-x:auto}
+.ev-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.ev-table thead th{padding:8px 10px;text-align:left;font-size:.67rem;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);background:var(--card2);border-bottom:1px solid var(--border2);white-space:nowrap}
+.ev-table tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.ev-table tbody tr:hover{background:var(--hover)}
+.ev-table tbody tr.ev-selected{background:rgba(0,229,255,.07)}
+.ev-table td{padding:7px 10px;vertical-align:middle}
+.ev-level-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:.67rem;font-weight:700;white-space:nowrap}
+.ev-detail-panel{margin-top:14px;padding:16px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--radius);display:none}
+.ev-detail-panel.open{display:block}
+.ev-detail-title{font-weight:700;font-size:.85rem;margin-bottom:10px;color:var(--accent)}
+.ev-detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:12px}
+.ev-detail-field{font-size:.75rem}
+.ev-detail-field span:first-child{color:var(--txt3);font-size:.68rem;display:block;margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em}
+.ev-detail-msg{font-size:.76rem;font-family:var(--font-mono);white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;max-height:200px;overflow-y:auto;color:var(--txt2);line-height:1.5}
+
+/* COPIA DE DATOS */
+.dc-step{padding:6px 12px;font-size:.75rem;font-weight:600;color:var(--txt3);background:var(--card);border:1px solid var(--border);border-radius:var(--radius);white-space:nowrap;transition:all .2s}
+.dc-step.active{color:var(--accent);border-color:var(--accent2);background:var(--accent-glow)}
+.dc-step.done{color:var(--green);border-color:rgba(0,230,118,.3)}
+.dc-step-arrow{color:var(--txt3);padding:0 4px;font-size:1rem;line-height:1}
+.dc-phase{display:none}
+.dc-phase.visible{display:flex;flex-direction:column}
+.dc-browser-row{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;font-size:.84rem;border-bottom:1px solid rgba(28,45,61,.5);transition:background .15s}
+.dc-browser-row:hover{background:var(--hover)}
+.dc-browser-row.selected{background:var(--accent-glow)}
+.dc-browser-row input[type=checkbox]{flex-shrink:0;accent-color:var(--accent);width:15px;height:15px}
+.dc-sel-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 8px;border-radius:4px;font-size:.8rem;margin-bottom:3px;background:var(--card2)}
+.dc-sel-item button{flex-shrink:0;background:none;border:none;cursor:pointer;color:var(--txt3);font-size:.9rem;line-height:1;padding:0 3px}
+.dc-sel-item button:hover{color:var(--red)}
+.dc-drive-chip{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 16px;border-radius:var(--radius);cursor:pointer;border:1px solid var(--border2);background:var(--card);font-size:.8rem;font-weight:600;transition:all .18s;min-width:80px}
+.dc-drive-chip:hover{border-color:var(--accent2);background:var(--accent-glow)}
+.dc-drive-chip.active{border-color:var(--accent);background:var(--accent-glow);color:var(--accent)}
+.dc-drive-chip .chip-free{font-size:.7rem;color:var(--txt3);font-weight:400}
 </style>
 </head>
 <body>
@@ -363,7 +417,7 @@ td{padding:10px 14px;vertical-align:middle}
 <nav id="sidebar">
   <div class="logo">
     <div class="logo-icon">⚙️</div>
-    <div><div class="logo-text">WinAdmin</div><div class="logo-sub">Tool v1.0</div></div>
+    <div><div class="logo-text">Mantendu</div><div class="logo-sub">v1.0</div></div>
   </div>
   <nav class="nav">
     <div class="nav-item active" data-section="users" onclick="navigate('users')"><span class="nav-icon">👤</span><span>Gestión de Usuarios</span></div>
@@ -373,6 +427,9 @@ td{padding:10px 14px;vertical-align:middle}
     <div class="nav-item" data-section="network" onclick="navigate('network')"><span class="nav-icon">🌐</span><span>Red</span></div>
     <div class="nav-item" data-section="perf" onclick="navigate('perf')"><span class="nav-icon">📊</span><span>Monitor</span></div>
     <div class="nav-item" data-section="svc" onclick="navigate('svc')"><span class="nav-icon">🔧</span><span>Servicios</span></div>
+    <div class="nav-item" data-section="evlog" onclick="navigate('evlog')"><span class="nav-icon">📋</span><span>Event Viewer</span></div>
+    <div class="nav-item" data-section="printers" onclick="navigate('printers')"><span class="nav-icon">🖨️</span><span>Impresoras</span></div>
+    <div class="nav-item" data-section="datacopy" onclick="navigate('datacopy')"><span class="nav-icon">📦</span><span>Copia de Datos</span></div>
   </nav>
   <div class="sidebar-footer">
     <div class="server-status"><div class="status-dot"></div><span>Simulación activa</span></div>
@@ -664,6 +721,227 @@ td{padding:10px 14px;vertical-align:middle}
   </div>
 </section>
 
+<!-- ══ EVENT VIEWER ══ -->
+<section id="section-evlog" class="section">
+  <div class="section-header">
+    <div>
+      <div class="section-title"><div class="section-title-icon">📋</div><span>Event Viewer</span></div>
+      <div class="section-desc">Visor de eventos del sistema Windows</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="ev-layout">
+      <div class="ev-sources card" style="padding:0">
+        <div style="padding:12px 14px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);border-bottom:1px solid var(--border)">Fuentes</div>
+        <div id="ev-source-list">
+          <div class="ev-source-item active" data-src="sys-error" onclick="evSelectSource(this)"><span class="ev-source-icon">🔴</span><span class="ev-source-label">Errores sistema</span><span class="ev-source-count" id="ev-cnt-sys-error">—</span></div>
+          <div class="ev-source-item" data-src="sys-warn" onclick="evSelectSource(this)"><span class="ev-source-icon">⚠️</span><span class="ev-source-label">Advertencias sistema</span><span class="ev-source-count" id="ev-cnt-sys-warn">—</span></div>
+          <div class="ev-source-item" data-src="app-error" onclick="evSelectSource(this)"><span class="ev-source-icon">💥</span><span class="ev-source-label">Errores aplicación</span><span class="ev-source-count" id="ev-cnt-app-error">—</span></div>
+          <div class="ev-source-item" data-src="security" onclick="evSelectSource(this)"><span class="ev-source-icon">🔒</span><span class="ev-source-label">Seguridad</span><span class="ev-source-count" id="ev-cnt-security">—</span></div>
+          <div class="ev-source-item" data-src="boot" onclick="evSelectSource(this)"><span class="ev-source-icon">🖥️</span><span class="ev-source-label">Inicio / Apagado</span><span class="ev-source-count" id="ev-cnt-boot">—</span></div>
+          <div class="ev-source-item" data-src="bsod" onclick="evSelectSource(this)"><span class="ev-source-icon">❌</span><span class="ev-source-label">Pantallazos azules</span><span class="ev-source-count" id="ev-cnt-bsod">—</span></div>
+        </div>
+        <div style="padding:12px 14px;border-top:1px solid var(--border)">
+          <button class="btn btn-secondary" style="width:100%;font-size:.75rem" onclick="evRefresh()">🔄 Actualizar todo</button>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px;padding:14px">
+          <div class="ev-toolbar">
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="ev-range-btn active" data-days="1" onclick="evSetRange(this)">24h</button>
+              <button class="ev-range-btn" data-days="7" onclick="evSetRange(this)">7 días</button>
+              <button class="ev-range-btn" data-days="30" onclick="evSetRange(this)">30 días</button>
+            </div>
+            <div class="ev-level-filter" id="ev-level-filter">
+              <span class="ev-level-chip active" data-level="error" onclick="evToggleLevel(this)" style="background:rgba(239,68,68,.15);border-color:#ef4444;color:#ef4444">🔴 Error</span>
+              <span class="ev-level-chip active" data-level="warning" onclick="evToggleLevel(this)" style="background:rgba(234,179,8,.15);border-color:#eab308;color:#eab308">⚠️ Advertencia</span>
+              <span class="ev-level-chip active" data-level="info" onclick="evToggleLevel(this)" style="background:rgba(59,130,246,.15);border-color:#3b82f6;color:#3b82f6">ℹ️ Info</span>
+            </div>
+            <input type="text" class="ev-search" id="ev-search" placeholder="🔍 Buscar en eventos..." oninput="evFilterTable()">
+          </div>
+        </div>
+        <div id="ev-loading" class="loading-state" style="display:none"><div class="spinner"></div><span>Cargando eventos...</span></div>
+        <div id="ev-empty" class="empty-state" style="display:none"><div class="empty-icon">📭</div><p>No se encontraron eventos</p></div>
+        <div id="ev-table-wrap" style="display:none">
+          <div style="font-size:.75rem;color:var(--txt3);margin-bottom:8px">Mostrando <span id="ev-showing">0</span> de <span id="ev-total">0</span> eventos</div>
+          <div class="ev-table-wrap">
+            <table class="ev-table">
+              <thead><tr><th style="width:90px">Nivel</th><th style="width:60px">ID</th><th style="width:145px">Fecha</th><th>Fuente</th><th>Descripción</th></tr></thead>
+              <tbody id="ev-tbody"></tbody>
+            </table>
+          </div>
+          <div class="ev-detail-panel" id="ev-detail">
+            <div class="ev-detail-title" id="ev-detail-title">Detalle del evento</div>
+            <div class="ev-detail-grid" id="ev-detail-grid"></div>
+            <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--txt3);margin-bottom:6px">Mensaje</div>
+            <div class="ev-detail-msg" id="ev-detail-msg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ COPIA DE DATOS ══ -->
+<section id="section-datacopy" class="section">
+  <div class="section-header">
+    <div>
+      <div class="section-title"><div class="section-title-icon">📦</div><span>Copia de Datos</span></div>
+      <div class="section-desc">Migración de datos entre equipos — selección, copia y verificación</div>
+    </div>
+    <div style="display:flex;gap:0;align-items:center" id="dc-steps-indicator">
+      <div class="dc-step" id="dc-si-1">1 Origen</div>
+      <div class="dc-step-arrow">›</div>
+      <div class="dc-step" id="dc-si-2">2 Destino</div>
+      <div class="dc-step-arrow">›</div>
+      <div class="dc-step" id="dc-si-3">3 Copia</div>
+      <div class="dc-step-arrow">›</div>
+      <div class="dc-step" id="dc-si-4">4 Verificar</div>
+    </div>
+  </div>
+  <div class="section-body" style="padding:0">
+    <div id="dc-phase-1" class="dc-phase visible" style="display:flex;flex:1;height:calc(100vh - 120px)">
+      <div style="width:55%;border-right:1px solid var(--border);display:flex;flex-direction:column">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-weight:600;font-size:.9rem">Explorar origen</span>
+          <button class="btn btn-secondary btn-xs" onclick="dcBrowseUp()" id="dc-browse-up">↑ Subir</button>
+          <span id="dc-current-path" style="font-family:var(--font-mono);font-size:.75rem;color:var(--txt2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        </div>
+        <div id="dc-browser-loading" class="loading-state" style="display:none"><div class="spinner"></div></div>
+        <div id="dc-browser-list" style="overflow-y:auto;flex:1;padding:8px 0"></div>
+      </div>
+      <div style="width:45%;display:flex;flex-direction:column">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between">
+          <span style="font-weight:600;font-size:.9rem">Seleccionados</span>
+          <div style="display:flex;gap:6px">
+            <span id="dc-sel-count" style="font-size:.78rem;color:var(--accent);font-family:var(--font-mono)">0 items</span>
+            <button class="btn btn-secondary btn-xs" onclick="dcClearSelection()">Limpiar</button>
+          </div>
+        </div>
+        <div id="dc-selected-list" style="overflow-y:auto;flex:1;padding:8px 12px"></div>
+        <div style="padding:14px 16px;border-top:1px solid var(--border);background:var(--surface)">
+          <div id="dc-preview-info" style="font-size:.8rem;color:var(--txt2);margin-bottom:10px"><span>Selecciona carpetas o archivos en el explorador</span></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm" onclick="dcCalculatePreview()" id="dc-btn-calc">🔢 Calcular tamaño</button>
+            <button class="btn btn-primary btn-sm" onclick="dcGoToStep(2)" id="dc-btn-next1" disabled>Siguiente →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="dc-phase-2" class="dc-phase" style="display:none;padding:24px 28px">
+      <div style="max-width:640px">
+        <h3 style="margin-bottom:20px;font-size:1rem;font-weight:700">Selecciona el destino</h3>
+        <div style="margin-bottom:18px">
+          <div style="font-size:.82rem;font-weight:600;color:var(--txt2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">Unidades disponibles</div>
+          <div id="dc-dest-drives" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label class="form-label">Ruta de destino</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-input" id="dc-dest-input" placeholder="C:\Backup\Usuario o \\servidor\share\Datos" oninput="dcValidateDest()">
+            <button class="btn btn-secondary btn-sm" onclick="dcBrowseDest()">Explorar</button>
+          </div>
+        </div>
+        <div id="dc-dest-browser-wrap" style="display:none;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;max-height:300px;overflow-y:auto">
+          <div style="padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;gap:8px;align-items:center">
+            <button class="btn btn-secondary btn-xs" onclick="dcDestBrowseUp()">↑</button>
+            <span id="dc-dest-current-path" style="font-family:var(--font-mono);font-size:.75rem;color:var(--txt2)"></span>
+          </div>
+          <div id="dc-dest-browser-list" style="padding:4px 0"></div>
+        </div>
+        <div id="dc-dest-warning" style="display:none;background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.3);border-radius:var(--radius);padding:10px 14px;font-size:.82rem;color:var(--amber);margin-bottom:14px"></div>
+        <div style="display:flex;gap:8px;margin-top:20px">
+          <button class="btn btn-secondary btn-sm" onclick="dcGoToStep(1)">← Atrás</button>
+          <button class="btn btn-primary btn-sm" onclick="dcGoToStep(3)" id="dc-btn-next2" disabled>Siguiente →</button>
+        </div>
+      </div>
+    </div>
+    <div id="dc-phase-3" class="dc-phase" style="display:none;padding:24px 28px">
+      <div style="max-width:600px">
+        <h3 style="margin-bottom:20px;font-size:1rem;font-weight:700">Resumen y copia</h3>
+        <div class="card" style="margin-bottom:20px" id="dc-summary-card">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div><div style="font-size:.72rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Archivos</div><div style="font-size:1.4rem;font-weight:700;color:var(--accent)" id="dc-sum-files">—</div></div>
+            <div><div style="font-size:.72rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Tamaño total</div><div style="font-size:1.4rem;font-weight:700;color:var(--accent)" id="dc-sum-size">—</div></div>
+            <div><div style="font-size:.72rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Orígenes</div><div style="font-size:.88rem;color:var(--txt)" id="dc-sum-origins">—</div></div>
+            <div><div style="font-size:.72rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Destino</div><div style="font-size:.88rem;color:var(--txt);font-family:var(--font-mono);word-break:break-all" id="dc-sum-dest">—</div></div>
+          </div>
+        </div>
+        <div id="dc-progress-wrap" style="display:none;margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:.82rem;font-weight:600" id="dc-prog-label">Copiando...</span>
+            <span style="font-size:.82rem;font-family:var(--font-mono);color:var(--accent)" id="dc-prog-pct">0%</span>
+          </div>
+          <div style="background:var(--border);border-radius:4px;height:8px;overflow:hidden;margin-bottom:8px">
+            <div id="dc-prog-bar" style="height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:4px;transition:width .3s;width:0%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.76rem;color:var(--txt2)">
+            <span id="dc-prog-current" style="font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%"></span>
+            <span id="dc-prog-count"></span>
+          </div>
+          <div id="dc-prog-errors" style="display:none;margin-top:6px;font-size:.78rem;color:var(--red)"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="dcGoToStep(2)" id="dc-btn-back3">← Atrás</button>
+          <button class="btn btn-primary" onclick="dcStartCopy()" id="dc-btn-start">▶ Iniciar copia</button>
+          <button class="btn btn-danger btn-sm" onclick="dcCancelCopy()" id="dc-btn-cancel" style="display:none">Cancelar copia</button>
+        </div>
+      </div>
+    </div>
+    <div id="dc-phase-4" class="dc-phase" style="display:none;padding:24px 28px">
+      <h3 style="margin-bottom:16px;font-size:1rem;font-weight:700">Verificación de la copia</h3>
+      <div id="dc-verify-loading" class="loading-state"><div class="spinner"></div> Verificando...</div>
+      <div id="dc-verify-result" style="display:none">
+        <div class="stats-row" style="margin-bottom:18px">
+          <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" id="dc-ver-total">—</div></div>
+          <div class="stat-card"><div class="stat-label">Correctos</div><div class="stat-value" id="dc-ver-ok" style="color:var(--green)">—</div></div>
+          <div class="stat-card"><div class="stat-label">Con error</div><div class="stat-value" id="dc-ver-fail" style="color:var(--red)">—</div></div>
+        </div>
+        <div id="dc-verify-errors-wrap" style="display:none">
+          <div style="font-size:.82rem;font-weight:700;color:var(--red);margin-bottom:8px">Archivos con error:</div>
+          <div class="tbl-wrap" style="max-height:300px;overflow-y:auto">
+            <table><thead><tr><th>Archivo</th><th>Estado</th></tr></thead><tbody id="dc-verify-errors-tbody"></tbody></table>
+          </div>
+        </div>
+        <div id="dc-verify-ok-msg" style="display:none;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);border-radius:var(--radius);padding:16px;text-align:center;margin-top:10px">
+          <div style="font-size:1.8rem;margin-bottom:6px">✅</div>
+          <div style="font-weight:700;color:var(--green)">Todos los archivos copiados correctamente</div>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="dcReset()">Nueva copia</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ IMPRESORAS ══ -->
+<section id="section-printers" class="section">
+  <div class="section-header">
+    <div>
+      <div class="section-title"><div class="section-title-icon">🖨️</div><span>Gestión de Impresoras</span></div>
+      <div class="section-desc">Impresoras instaladas, colas de impresión y configuración</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="openAddPrinterModal()">➕ Añadir impresora</button>
+      <button class="btn btn-secondary btn-sm" onclick="loadPrinters()">🔄 Actualizar</button>
+    </div>
+  </div>
+  <div class="section-body">
+    <div id="printers-loading" class="loading-state"><div class="spinner"></div><span>Cargando impresoras...</span></div>
+    <div id="printers-empty" class="empty-state" style="display:none"><div class="empty-icon">🖨️</div><p>No se encontraron impresoras instaladas</p></div>
+    <div id="printers-content" style="display:none">
+      <div class="stats-row" style="margin-bottom:20px">
+        <div class="stat-card"><div class="stat-label">Impresoras</div><div class="stat-value" id="stat-printers-count">—</div></div>
+        <div class="stat-card"><div class="stat-label">Predeterminada</div><div class="stat-value" id="stat-printers-default" style="font-size:.85rem;word-break:break-all">—</div></div>
+        <div class="stat-card"><div class="stat-label">Trabajos pendientes</div><div class="stat-value" id="stat-printers-jobs">—</div></div>
+      </div>
+      <div id="printers-list"></div>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <!-- MODAL -->
@@ -786,7 +1064,34 @@ const MOCK = {
     {Name:'MapsBroker',     DisplayName:'Administrador de mapas descargados', Status:'Stopped', StartType:'Automatic', Description:'Servicio de Windows para el acceso de aplicaciones a los mapas descargados.'},
     {Name:'wbengine',       DisplayName:'Servicio de motor de copia de seguridad en bloque', Status:'Stopped', StartType:'Manual', Description:'El servicio de motor de copia de seguridad en bloque se utiliza en copias de seguridad de Windows.'},
     {Name:'Browser',        DisplayName:'Examinador de equipos',           Status:'Stopped', StartType:'Disabled',  Description:'Mantiene una lista actualizada de los equipos de la red.'},
-  ]
+  ],
+  printers: [
+    {Name:'HP LaserJet M402', PortName:'192.168.1.50', DriverName:'HP LaserJet M402 PCL 6', Default:true,  Shared:true,  Status:0, WorkOffline:false, JobCount:2},
+    {Name:'Canon PIXMA TS8350', PortName:'192.168.1.51', DriverName:'Canon PIXMA TS8000 series', Default:false, Shared:false, Status:0, WorkOffline:false, JobCount:0},
+    {Name:'Epson EcoTank L3150', PortName:'USB001',     DriverName:'Epson L3150 Series',    Default:false, Shared:false, Status:0, WorkOffline:false, JobCount:1},
+    {Name:'Brother MFC-L2710',  PortName:'192.168.1.52', DriverName:'Brother MFC-L2710DW series', Default:false, Shared:true, Status:0, WorkOffline:false, JobCount:0},
+    {Name:'Microsoft Print to PDF', PortName:'PORTPROMPT:', DriverName:'Microsoft Print To PDF', Default:false, Shared:false, Status:0, WorkOffline:false, JobCount:0},
+    {Name:'Fax',               PortName:'SHRFAX:',    DriverName:'Microsoft Shared Fax Driver', Default:false, Shared:false, Status:0, WorkOffline:true, JobCount:0},
+  ],
+  printerJobs: {
+    'HP LaserJet M402': [
+      {Id:1, Document:'Informe_Q1_2026.pdf', Owner:'jgonzalez', Pages:12, Submitted:'29/03/2026 09:14', Status:'Imprimiendo', SizeDisp:'2.3 MB'},
+      {Id:2, Document:'Presupuesto_cliente.docx', Owner:'mlopez', Pages:4, Submitted:'29/03/2026 09:15', Status:'En cola', SizeDisp:'890 KB'},
+    ],
+    'Epson EcoTank L3150': [
+      {Id:5, Document:'Foto_cumpleaños.jpg', Owner:'aitorerrea', Pages:1, Submitted:'29/03/2026 08:55', Status:'En cola', SizeDisp:'4.1 MB'},
+    ],
+  },
+  printerDrivers: [
+    'HP LaserJet M402 PCL 6',
+    'HP Universal Printing PCL 6',
+    'Canon PIXMA TS8000 series',
+    'Epson L3150 Series',
+    'Brother MFC-L2710DW series',
+    'Microsoft Print To PDF',
+    'Microsoft XPS Document Writer v4',
+    'Generic / Text Only',
+  ],
 };
 
 /* ════════ MOCK API ═════════════════════════════════════════════ */
@@ -804,7 +1109,11 @@ const api = {
       if (url.includes('/api/scan-pst'))      return res(MOCK.pstFiles);
       if (url.includes('/api/network'))       return res(MOCK.network);
       if (url.includes('/api/perf'))          return res(genPerfSnap());
-      if (url.includes('/api/services'))      return res([...MOCK.services].sort((a,b)=>a.DisplayName.localeCompare(b.DisplayName)));
+      if (url.includes('/api/services'))        return res([...MOCK.services].sort((a,b)=>a.DisplayName.localeCompare(b.DisplayName)));
+      if (url.includes('/api/printers'))        return res([...MOCK.printers]);
+      if (url.includes('/api/printer-jobs'))    { const pn=decodeURIComponent(new URL(url,location).searchParams.get('printer')||''); return res(MOCK.printerJobs[pn]||[]); }
+      if (url.includes('/api/printer-drivers')) return res([...MOCK.printerDrivers]);
+      if (url.includes('/api/datacopy-progress')) return res({status:'done',total:150,copied:150,errors:0,pct:100,done:true,errorList:[]});
       res({});
     }, 400 + Math.random()*300);
   }),
@@ -842,6 +1151,47 @@ const api = {
         if(svc) svc.StartType=data.startType;
         return res({success:true});
       }
+      if (url.includes('/api/printer-set-default')) {
+        MOCK.printers.forEach(p=>p.Default=p.Name===data.printer);
+        return res({success:true});
+      }
+      if (url.includes('/api/printer-delete')) {
+        const i=MOCK.printers.findIndex(p=>p.Name===data.printer);
+        if(i>-1) MOCK.printers.splice(i,1);
+        return res({success:true});
+      }
+      if (url.includes('/api/printer-clear-queue')) {
+        MOCK.printerJobs[data.printer]=[];
+        const p=MOCK.printers.find(p=>p.Name===data.printer);
+        if(p) p.JobCount=0;
+        return res({success:true});
+      }
+      if (url.includes('/api/printer-cancel-job')) {
+        const jobs=MOCK.printerJobs[data.printer]||[];
+        const i=jobs.findIndex(j=>j.Id===data.jobId);
+        if(i>-1) jobs.splice(i,1);
+        const p=MOCK.printers.find(p=>p.Name===data.printer);
+        if(p) p.JobCount=Math.max(0,(p.JobCount||0)-1);
+        return res({success:true});
+      }
+      if (url.includes('/api/printer-add')) {
+        MOCK.printers.push({Name:data.name,PortName:data.ip,DriverName:data.driver,Default:false,Shared:false,Status:0,WorkOffline:false,JobCount:0});
+        return res({success:true});
+      }
+      if (url.includes('/api/datacopy-preview')) return res({FileCount:150,TotalBytes:1288490188,TotalDisplay:'1.2 GB'});
+      if (url.includes('/api/datacopy-start'))   return res({success:true,total:150});
+      if (url.includes('/api/datacopy-verify'))  return res({total:150,ok:150,failed:0,items:[]});
+      if (url.includes('/api/datacopy-cancel'))  return res({success:true});
+      if (url.includes('/api/service-start')||url.includes('/api/service-stop')||url.includes('/api/service-restart')) {
+        const sn=data.service; const svc=MOCK.services.find(s=>s.Name===sn);
+        if(svc){if(url.includes('stop'))svc.Status='Stopped';else svc.Status='Running';}
+        return res({success:true});
+      }
+      if (url.includes('/api/service-starttype')) {
+        const svc=MOCK.services.find(s=>s.Name===data.service);
+        if(svc) svc.StartType=data.startType;
+        return res({success:true});
+      }
       res({success:true});
     }, 600 + Math.random()*400);
   })
@@ -854,7 +1204,52 @@ function setLang(lang) {
   document.getElementById('langES').classList.toggle('active', lang==='es');
   document.getElementById('langEU').classList.toggle('active', lang==='eu');
 }
-function t(key) { return key; } // simplified - keys are already Spanish
+const LANG = {
+  es: {
+    'nav.printers':'Impresoras','nav.datacopy':'Copia de Datos',
+    'printers.title':'Gestión de Impresoras','printers.desc':'Impresoras instaladas, colas de impresión y configuración',
+    'printers.empty':'No se encontraron impresoras instaladas',
+    'printers.statCount':'Impresoras','printers.statDefault':'Predeterminada','printers.statJobs':'Trabajos pendientes',
+    'pr.add':'Añadir impresora','pr.setDefault':'Predeterminada','pr.isDefault':'✔ Predeterminada',
+    'pr.delete':'Eliminar','pr.viewQueue':'Ver cola','pr.clearQueue':'Vaciar cola',
+    'pr.colDoc':'Documento','pr.colOwner':'Usuario','pr.colPages':'Páginas',
+    'pr.colSize':'Tamaño','pr.colSubmitted':'Enviado','pr.colStatus':'Estado','pr.colActions':'Acciones',
+    'pr.cancelJob':'Cancelar','pr.noJobs':'Cola vacía','pr.port':'Puerto','pr.driver':'Driver',
+    'pr.shared':'Compartida','pr.offline':'Fuera de línea','pr.online':'En línea',
+    'pr.addTitle':'Añadir impresora TCP/IP','pr.addName':'Nombre de la impresora',
+    'pr.addIp':'Dirección IP o hostname','pr.addDriver':'Driver (nombre exacto)','pr.addDriverHint':'Selecciona uno de los drivers instalados:',
+    'modal.pr.delete.title':'Eliminar impresora','modal.pr.delete.desc':'Se eliminará la impresora del sistema. Los trabajos en cola se perderán.',
+    'modal.pr.clear.title':'Vaciar cola de impresión','modal.pr.clear.desc':'Se cancelarán todos los trabajos pendientes de esta impresora.',
+    'toast.pr.default':'Impresora predeterminada actualizada','toast.pr.deleted':'Impresora eliminada',
+    'toast.pr.cleared':'Cola vaciada','toast.pr.cancelled':'Trabajo cancelado','toast.pr.added':'Impresora añadida correctamente',
+    'loading.printers':'Cargando impresoras...',
+    'dc.title':'Copia de Datos','dc.desc':'Migración de datos entre equipos — selección, copia y verificación',
+    'dc.step1short':'Origen','dc.step2short':'Destino','dc.step3short':'Copia','dc.step4short':'Verificar',
+    'dc.browseOrigin':'Explorar origen','dc.selected':'Seleccionados','dc.clearSel':'Limpiar',
+    'dc.previewHint':'Selecciona carpetas o archivos en el explorador','dc.calculate':'Calcular tamaño',
+    'dc.next':'Siguiente','dc.back':'Atrás','dc.step2title':'Selecciona el destino',
+    'dc.quickDrives':'Unidades disponibles','dc.destPath':'Ruta de destino','dc.browse':'Explorar',
+    'dc.step3title':'Resumen y copia','dc.summaryFiles':'Archivos','dc.summarySize':'Tamaño total',
+    'dc.summaryOrigins':'Orígenes','dc.summaryDest':'Destino','dc.copying':'Copiando...',
+    'dc.startCopy':'Iniciar copia','dc.cancelCopy':'Cancelar copia',
+    'dc.step4title':'Verificación de la copia','dc.verifying':'Verificando archivos...',
+    'dc.verTotal':'Total','dc.verOk':'Correctos','dc.verFail':'Con error',
+    'dc.verFailedFiles':'Archivos con error:','dc.verFile':'Archivo','dc.verStatus':'Estado',
+    'dc.verAllOk':'Todos los archivos copiados correctamente','dc.newCopy':'Nueva copia',
+    'toast.dc.done':'Copia completada','toast.dc.cancelled':'Copia cancelada','toast.dc.error':'Error durante la copia',
+    'svc.filterAll':'Todos','svc.filterRunning':'Activos','svc.filterStopped':'Detenidos','svc.filterDisabled':'Deshabilitados',
+    'btn.cancel':'Cancelar','btn.confirm':'Confirmar','btn.refresh':'Actualizar',
+    'toast.error':'Error en la operación','explorer.noAccess':'Sin acceso a esta carpeta',
+    'modal.svc.stop.title':'Detener servicio','modal.svc.stop.desc':'Detener este servicio puede afectar al funcionamiento del sistema.',
+    'modal.svc.restart.title':'Reiniciar servicio','modal.svc.restart.desc':'El servicio se detendrá y volverá a iniciarse.',
+    'toast.svc.started':'Servicio iniciado','toast.svc.stopped':'Servicio detenido','toast.svc.restarted':'Servicio reiniciado','toast.svc.startType':'Tipo de inicio actualizado',
+    'svc.start':'Iniciar','svc.stop':'Detener','svc.restart':'Reiniciar',
+    'svc.running':'Activo','svc.stopped':'Detenido','svc.paused':'Pausado',
+    'svc.startAuto':'Automático','svc.startAutoDelay':'Automático (retrasado)','svc.startManual':'Manual','svc.startDisabled':'Deshabilitado',
+  },
+  eu: {}
+};
+function t(key) { return LANG[currentLang]?.[key] || LANG['es']?.[key] || key; }
 
 function navigate(section) {
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
@@ -865,12 +1260,15 @@ function navigate(section) {
   if(section!=='perf'&&perfInterval){clearInterval(perfInterval);perfInterval=null;perfStarted=false;perfHistory.cpu=[];perfHistory.ram=[];}
   if(section!=='svc') svcLoaded=false;
 
-  if (section==='users'   && !usersLoaded)   loadUsers();
-  if (section==='format'  && !drivesLoaded)  loadDrives();
-  if (section==='cleanup' && !cleanupLoaded) loadCleanup();
-  if (section==='network' && !networkLoaded) loadNetwork();
-  if (section==='perf'    && !perfStarted)   startPerf();
-  if (section==='svc'     && !svcLoaded)     loadServices();
+  if (section==='users'    && !usersLoaded)    loadUsers();
+  if (section==='format'   && !drivesLoaded)   loadDrives();
+  if (section==='cleanup'  && !cleanupLoaded)  loadCleanup();
+  if (section==='network'  && !networkLoaded)  loadNetwork();
+  if (section==='perf'     && !perfStarted)    startPerf();
+  if (section==='svc'      && !svcLoaded)      loadServices();
+  if (section==='evlog')                       initEvLog();
+  if (section==='printers' && !printersLoaded) loadPrinters();
+  if (section==='datacopy')                    initDataCopy();
 }
 
 function toast(msg, type='info') {
@@ -1888,6 +2286,657 @@ async function svcSetStartup(name, startType) {
     if(svc) svc.StartType=startType;
     applyServicesFilter();
   } else { toast(res.error||'Error','error'); applyServicesFilter(); }
+}
+
+/* ════════ ESCATTR ══════════════════════════════════════════════ */
+function escAttr(s) { return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+/* ══ MÓDULO EVENT VIEWER ════════════════════════════════════════ */
+let evLoaded = false;
+const MOCK_EVENTS = {
+  'sys-error': [
+    {Id:1001,Level:'Error',  Source:'Kernel-Power',     Time:'29/03/2026 07:12:44',Message:'El sistema ha recuperado de una parada inesperada.'},
+    {Id:7034,Level:'Error',  Source:'Service Control Manager',Time:'28/03/2026 18:45:01',Message:'El servicio se terminó inesperadamente. Esto ha ocurrido 1 vez(ces).'},
+    {Id:1000,Level:'Error',  Source:'Application Error',Time:'28/03/2026 14:22:10',Message:'Nombre de la aplicación con errores: explorer.exe, versión: 10.0.19041.1'},
+  ],
+  'sys-warn': [
+    {Id:4201,Level:'Warning',Source:'Tcpip',            Time:'29/03/2026 09:01:05',Message:'El sistema ha detectado que el adaptador de red Ethernet estuvo desconectado de la red.'},
+    {Id:36,  Level:'Warning',Source:'volsnap',          Time:'27/03/2026 22:00:00',Message:'La configuración de instantánea de volumen para el volumen podría quedar sin espacio.'},
+  ],
+  'app-error': [
+    {Id:1000,Level:'Error',  Source:'Application Error',Time:'29/03/2026 08:50:33',Message:'Nombre de la aplicación con errores: OUTLOOK.EXE'},
+    {Id:1026,Level:'Error',  Source:'.NET Runtime',     Time:'28/03/2026 16:11:55',Message:'Application: PowerShell.exe Framework Version: v4.0.30319'},
+  ],
+  'security': [
+    {Id:4624,Level:'Info',   Source:'Security',         Time:'29/03/2026 09:00:01',Message:'Se ha iniciado sesión correctamente en una cuenta.'},
+    {Id:4648,Level:'Info',   Source:'Security',         Time:'29/03/2026 08:59:55',Message:'Se intentó iniciar sesión con credenciales explícitas.'},
+    {Id:4625,Level:'Warning',Source:'Security',         Time:'28/03/2026 23:14:03',Message:'No se pudo iniciar la sesión de una cuenta. Nombre de cuenta: admin'},
+  ],
+  'boot': [
+    {Id:6005,Level:'Info',   Source:'EventLog',         Time:'29/03/2026 07:12:40',Message:'El servicio de registro de sucesos fue iniciado.'},
+    {Id:6009,Level:'Info',   Source:'EventLog',         Time:'29/03/2026 07:12:40',Message:'Microsoft Windows 10 Pro 19045 Multiprocessor Free.'},
+    {Id:6006,Level:'Info',   Source:'EventLog',         Time:'28/03/2026 22:30:12',Message:'El servicio de registro de sucesos fue detenido.'},
+  ],
+  'bsod': [],
+};
+
+let evCurrentSrc = 'sys-error';
+let evAllEvents  = [];
+let evActiveLevels = new Set(['error','warning','info']);
+let evRangeDays  = 1;
+let evSearchTerm = '';
+
+function initEvLog() {
+  if (!evLoaded) {
+    evLoaded = true;
+    // Show counts
+    Object.keys(MOCK_EVENTS).forEach(src => {
+      const el = document.getElementById(`ev-cnt-${src}`);
+      if (el) el.textContent = MOCK_EVENTS[src].length;
+    });
+    evLoadSource('sys-error');
+  }
+}
+
+function evSelectSource(el) {
+  document.querySelectorAll('.ev-source-item').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  evCurrentSrc = el.dataset.src;
+  evLoadSource(evCurrentSrc);
+}
+
+function evLoadSource(src) {
+  evCurrentSrc = src;
+  document.getElementById('ev-loading').style.display = 'flex';
+  document.getElementById('ev-table-wrap').style.display = 'none';
+  document.getElementById('ev-empty').style.display = 'none';
+  setTimeout(() => {
+    evAllEvents = MOCK_EVENTS[src] || [];
+    document.getElementById('ev-loading').style.display = 'none';
+    evFilterTable();
+  }, 300);
+}
+
+function evSetRange(btn) {
+  document.querySelectorAll('.ev-range-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  evRangeDays = parseInt(btn.dataset.days);
+  evFilterTable();
+}
+
+function evToggleLevel(chip) {
+  const lvl = chip.dataset.level;
+  if (evActiveLevels.has(lvl)) { evActiveLevels.delete(lvl); chip.classList.add('inactive'); }
+  else { evActiveLevels.add(lvl); chip.classList.remove('inactive'); }
+  evFilterTable();
+}
+
+function evFilterTable() {
+  const search = (document.getElementById('ev-search')?.value || '').toLowerCase();
+  const filtered = evAllEvents.filter(e => {
+    const lvl = (e.Level||'').toLowerCase();
+    const lvlKey = lvl === 'error' ? 'error' : lvl === 'warning' ? 'warning' : 'info';
+    if (!evActiveLevels.has(lvlKey)) return false;
+    if (search && !e.Source.toLowerCase().includes(search) && !e.Message.toLowerCase().includes(search) && !String(e.Id).includes(search)) return false;
+    return true;
+  });
+  document.getElementById('ev-total').textContent = evAllEvents.length;
+  document.getElementById('ev-showing').textContent = filtered.length;
+  if (!filtered.length) {
+    document.getElementById('ev-empty').style.display = 'flex';
+    document.getElementById('ev-table-wrap').style.display = 'none';
+    return;
+  }
+  document.getElementById('ev-empty').style.display = 'none';
+  document.getElementById('ev-table-wrap').style.display = 'block';
+  const tbody = document.getElementById('ev-tbody');
+  const levelStyle = { Error:'background:rgba(239,68,68,.15);color:#ef4444', Warning:'background:rgba(234,179,8,.15);color:#eab308', Info:'background:rgba(59,130,246,.15);color:#3b82f6' };
+  const levelIcon  = { Error:'🔴', Warning:'⚠️', Info:'ℹ️' };
+  tbody.innerHTML = filtered.map((e,i) => `<tr onclick="evShowDetail(${i},this)">
+    <td><span class="ev-level-badge" style="${levelStyle[e.Level]||''}">${levelIcon[e.Level]||'•'} ${e.Level}</span></td>
+    <td style="font-family:var(--font-mono)">${e.Id}</td>
+    <td style="font-family:var(--font-mono);font-size:.75rem">${e.Time}</td>
+    <td style="font-size:.78rem">${escHtml(e.Source)}</td>
+    <td style="font-size:.78rem;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(e.Message)}</td>
+  </tr>`).join('');
+  document.getElementById('ev-detail').classList.remove('open');
+}
+
+function evShowDetail(idx, trEl) {
+  const filtered = evAllEvents.filter(e => {
+    const lvl = (e.Level||'').toLowerCase();
+    const lvlKey = lvl === 'error' ? 'error' : lvl === 'warning' ? 'warning' : 'info';
+    return evActiveLevels.has(lvlKey);
+  });
+  const e = filtered[idx];
+  if (!e) return;
+  document.querySelectorAll('#ev-tbody tr').forEach(r => r.classList.remove('ev-selected'));
+  trEl.classList.add('ev-selected');
+  document.getElementById('ev-detail-title').textContent = `Evento ${e.Id} — ${e.Source}`;
+  document.getElementById('ev-detail-grid').innerHTML = `
+    <div class="ev-detail-field"><span>ID</span><span style="font-family:var(--font-mono)">${e.Id}</span></div>
+    <div class="ev-detail-field"><span>Nivel</span><span>${e.Level}</span></div>
+    <div class="ev-detail-field"><span>Fuente</span><span>${escHtml(e.Source)}</span></div>
+    <div class="ev-detail-field"><span>Fecha</span><span style="font-family:var(--font-mono)">${e.Time}</span></div>`;
+  document.getElementById('ev-detail-msg').textContent = e.Message;
+  document.getElementById('ev-detail').classList.add('open');
+}
+
+function evRefresh() { evLoaded = false; initEvLog(); }
+
+/* ══ MÓDULO COPIA DE DATOS ══════════════════════════════════════ */
+const DC = {
+  step:          1,
+  selected:      new Map(),
+  currentPath:   '',
+  destPath:      '',
+  destBrowsePath:'',
+  copyInterval:  null,
+  previewData:   null,
+  sourcesList:   [],
+};
+
+function initDataCopy() {
+  if (!DC.currentPath) dcBrowseTo('C:\\Users');
+  dcUpdateStepIndicator();
+  if (!DC.destDrivesLoaded) dcLoadDestDrives();
+}
+
+function dcUpdateStepIndicator() {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById(`dc-si-${i}`);
+    if (!el) continue;
+    el.classList.toggle('active', i === DC.step);
+    el.classList.toggle('done',   i < DC.step);
+  }
+}
+
+function dcGoToStep(n) {
+  if (n === 3 && DC.selected.size === 0) { toast('Selecciona al menos un elemento', 'warn'); return; }
+  if (n === 3 && !DC.destPath)           { toast('Indica la ruta de destino', 'warn'); return; }
+  DC.step = n;
+  dcUpdateStepIndicator();
+  document.querySelectorAll('.dc-phase').forEach(p => { p.style.display = 'none'; p.classList.remove('visible'); });
+  const phase = document.getElementById(`dc-phase-${n}`);
+  phase.style.display = 'flex';
+  phase.classList.add('visible');
+  if (n === 3) dcPrepareSummary();
+}
+
+async function dcBrowseTo(path) {
+  DC.currentPath = path;
+  document.getElementById('dc-current-path').textContent = path;
+  document.getElementById('dc-browser-loading').style.display = 'flex';
+  document.getElementById('dc-browser-list').innerHTML = '';
+  try {
+    const data = await api.get(`/api/browse?path=${encodeURIComponent(path)}`);
+    dcRenderBrowserList(data);
+  } catch(e) {
+    document.getElementById('dc-browser-list').innerHTML = `<div style="padding:20px;color:var(--red);font-size:.85rem">Sin acceso a esta carpeta</div>`;
+  } finally {
+    document.getElementById('dc-browser-loading').style.display = 'none';
+    document.getElementById('dc-browse-up').disabled = !path || path.length <= 3;
+  }
+}
+
+function dcBrowseUp() {
+  if (!DC.currentPath || DC.currentPath.length <= 3) return;
+  const parent = DC.currentPath.replace(/\\[^\\]+$/, '') || DC.currentPath.slice(0, 3);
+  dcBrowseTo(parent);
+}
+
+function dcRenderBrowserList(data) {
+  const list = document.getElementById('dc-browser-list');
+  if (!data || !data.items || data.items.length === 0) {
+    list.innerHTML = `<div style="padding:20px;color:var(--txt3);font-size:.85rem">Carpeta vacía</div>`;
+    return;
+  }
+  list.innerHTML = data.items.map(item => {
+    const icon  = item.type === 'folder' ? '📁' : '📄';
+    const isSel = DC.selected.has(item.FullPath);
+    const sizeStr = item.type === 'file' ? `<span style="color:var(--txt3);font-size:.72rem;margin-left:auto">${item.SizeDisplay}</span>` : '';
+    return `<div class="dc-browser-row ${isSel?'selected':''}">
+      <input type="checkbox" ${isSel?'checked':''} onclick="dcToggleSelect(event,'${escAttr(item.FullPath)}','${escAttr(item.Name)}','${item.type}','${escAttr(item.SizeDisplay||'')}')">
+      <span style="cursor:pointer;flex:1;display:flex;align-items:center;gap:6px" onclick="${item.type==='folder'?`dcBrowseTo('${escAttr(item.FullPath)}')`:''}">
+        ${icon} <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(item.Name)}</span>
+      </span>
+      ${sizeStr}
+    </div>`;
+  }).join('');
+}
+
+function dcToggleSelect(e, fullPath, name, type, sizeDisplay) {
+  e.stopPropagation();
+  if (DC.selected.has(fullPath)) DC.selected.delete(fullPath);
+  else DC.selected.set(fullPath, { name, type, sizeDisplay });
+  dcRenderSelectedList();
+  dcBrowseTo(DC.currentPath);
+}
+
+function dcClearSelection() {
+  DC.selected.clear();
+  dcRenderSelectedList();
+  dcBrowseTo(DC.currentPath);
+}
+
+function dcRenderSelectedList() {
+  const list = document.getElementById('dc-selected-list');
+  const count = DC.selected.size;
+  document.getElementById('dc-sel-count').textContent = `${count} item${count!==1?'s':''}`;
+  document.getElementById('dc-btn-next1').disabled = count === 0;
+  if (count === 0) {
+    list.innerHTML = `<div style="color:var(--txt3);font-size:.82rem;padding:16px 8px">Selecciona carpetas o archivos en el explorador</div>`;
+    document.getElementById('dc-preview-info').innerHTML = `<span>Selecciona carpetas o archivos en el explorador</span>`;
+    return;
+  }
+  list.innerHTML = [...DC.selected.entries()].map(([path, info]) => {
+    const icon = info.type === 'folder' ? '📁' : '📄';
+    return `<div class="dc-sel-item">
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" title="${escAttr(path)}">${icon} ${escHtml(info.name)}</span>
+      ${info.sizeDisplay ? `<span style="color:var(--txt3);font-size:.72rem;flex-shrink:0">${escHtml(info.sizeDisplay)}</span>` : ''}
+      <button onclick="dcRemoveSel('${escAttr(path)}')" title="Quitar">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function dcRemoveSel(path) {
+  DC.selected.delete(path);
+  dcRenderSelectedList();
+  dcBrowseTo(DC.currentPath);
+}
+
+async function dcCalculatePreview() {
+  if (DC.selected.size === 0) return;
+  const btn = document.getElementById('dc-btn-calc');
+  btn.disabled = true;
+  document.getElementById('dc-preview-info').innerHTML = '<div class="spinner" style="display:inline-block;width:14px;height:14px;border-width:2px;margin-right:6px"></div> Calculando...';
+  try {
+    const paths = [...DC.selected.keys()];
+    DC.previewData = await api.post('/api/datacopy-preview', { paths });
+    document.getElementById('dc-preview-info').innerHTML =
+      `📄 <strong>${DC.previewData.FileCount.toLocaleString()}</strong> archivos · 💾 <strong style="color:var(--accent)">${DC.previewData.TotalDisplay}</strong>`;
+  } catch(e) {
+    document.getElementById('dc-preview-info').innerHTML = `<span style="color:var(--red)">Error al calcular</span>`;
+  } finally { btn.disabled = false; }
+}
+
+DC.destDrivesLoaded = false;
+
+async function dcLoadDestDrives() {
+  try {
+    const drives = await api.get('/api/drives');
+    DC.destDrivesLoaded = true;
+    const wrap = document.getElementById('dc-dest-drives');
+    wrap.innerHTML = (drives || []).map(d => {
+      const freeDisp = d.FreeDisplay || '—';
+      return `<div class="dc-drive-chip" onclick="dcSelectDrive('${escAttr(d.Letter+':')}')">
+        <span style="font-size:1.2rem">${d.Type==='Extraíble'?'🔌':'💾'}</span>
+        <span>${escHtml(d.Letter)}:</span>
+        <span class="chip-free">${freeDisp} libre</span>
+      </div>`;
+    }).join('');
+  } catch(e) {}
+}
+
+function dcSelectDrive(drive) {
+  document.querySelectorAll('.dc-drive-chip').forEach(c => c.classList.remove('active'));
+  const input = document.getElementById('dc-dest-input');
+  input.value = drive + '\\';
+  DC.destPath = input.value;
+  dcValidateDest();
+}
+
+function dcValidateDest() {
+  const val = document.getElementById('dc-dest-input').value.trim();
+  DC.destPath = val;
+  const btn = document.getElementById('dc-btn-next2');
+  btn.disabled = val.length < 3;
+  const warn = document.getElementById('dc-dest-warning');
+  const srcPaths = [...DC.selected.keys()];
+  const overlap = srcPaths.some(s => val.toLowerCase().startsWith(s.toLowerCase()));
+  if (overlap) {
+    warn.textContent = '⚠️ El destino está dentro de uno de los orígenes seleccionados.';
+    warn.style.display = 'block'; btn.disabled = true;
+  } else { warn.style.display = 'none'; }
+}
+
+function dcBrowseDest() {
+  const wrap = document.getElementById('dc-dest-browser-wrap');
+  if (wrap.style.display !== 'none') { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  const startPath = DC.destPath && DC.destPath.length >= 3 ? DC.destPath : 'C:\\';
+  dcDestBrowseTo(startPath);
+}
+
+async function dcDestBrowseTo(path) {
+  DC.destBrowsePath = path;
+  document.getElementById('dc-dest-current-path').textContent = path;
+  const list = document.getElementById('dc-dest-browser-list');
+  list.innerHTML = '<div style="padding:12px;color:var(--txt3);font-size:.8rem">Cargando...</div>';
+  try {
+    const data = await api.get(`/api/browse?path=${encodeURIComponent(path)}`);
+    const folders = (data.items || []).filter(i => i.type === 'folder');
+    list.innerHTML = `<div class="dc-browser-row" onclick="dcDestSelectPath('${escAttr(path)}')" style="color:var(--accent);font-weight:600">
+        ✔ Usar esta carpeta: <span style="font-family:var(--font-mono)">${escHtml(path)}</span></div>` +
+      folders.map(f => `<div class="dc-browser-row" onclick="dcDestBrowseTo('${escAttr(f.FullPath)}')">📁 ${escHtml(f.Name)}</div>`).join('');
+  } catch(e) { list.innerHTML = '<div style="padding:12px;color:var(--red);font-size:.8rem">Sin acceso</div>'; }
+}
+
+function dcDestBrowseUp() {
+  if (!DC.destBrowsePath || DC.destBrowsePath.length <= 3) return;
+  const parent = DC.destBrowsePath.replace(/\\[^\\]+$/, '') || DC.destBrowsePath.slice(0, 3);
+  dcDestBrowseTo(parent);
+}
+
+function dcDestSelectPath(path) {
+  document.getElementById('dc-dest-input').value = path;
+  DC.destPath = path;
+  document.getElementById('dc-dest-browser-wrap').style.display = 'none';
+  dcValidateDest();
+}
+
+async function dcPrepareSummary() {
+  DC.sourcesList = [...DC.selected.keys()];
+  if (!DC.previewData) {
+    document.getElementById('dc-sum-files').textContent = '...';
+    document.getElementById('dc-sum-size').textContent  = '...';
+    try { DC.previewData = await api.post('/api/datacopy-preview', { paths: DC.sourcesList }); } catch(e) {}
+  }
+  document.getElementById('dc-sum-files').textContent   = DC.previewData ? DC.previewData.FileCount.toLocaleString() : '—';
+  document.getElementById('dc-sum-size').textContent    = DC.previewData ? DC.previewData.TotalDisplay : '—';
+  document.getElementById('dc-sum-origins').textContent = DC.sourcesList.map(p => p.split('\\').pop()).join(', ');
+  document.getElementById('dc-sum-dest').textContent    = DC.destPath;
+  document.getElementById('dc-progress-wrap').style.display = 'none';
+  document.getElementById('dc-btn-start').style.display     = '';
+  document.getElementById('dc-btn-cancel').style.display    = 'none';
+  document.getElementById('dc-btn-back3').disabled          = false;
+}
+
+async function dcStartCopy() {
+  document.getElementById('dc-btn-start').style.display     = 'none';
+  document.getElementById('dc-btn-cancel').style.display    = '';
+  document.getElementById('dc-btn-back3').disabled          = true;
+  document.getElementById('dc-progress-wrap').style.display = 'block';
+  document.getElementById('dc-prog-label').textContent      = 'Copiando...';
+  document.getElementById('dc-prog-bar').style.width        = '0%';
+  document.getElementById('dc-prog-pct').textContent        = '0%';
+  document.getElementById('dc-prog-current').textContent    = '';
+  document.getElementById('dc-prog-count').textContent      = '';
+  document.getElementById('dc-prog-errors').style.display   = 'none';
+  try {
+    const r = await api.post('/api/datacopy-start', { sources: DC.sourcesList, dest: DC.destPath });
+    if (!r.success) { toast('Error durante la copia', 'error'); dcResetCopyUI(); return; }
+    DC.copyInterval = setInterval(dcPollProgress, 800);
+  } catch(e) { toast('Error durante la copia', 'error'); dcResetCopyUI(); }
+}
+
+async function dcPollProgress() {
+  try {
+    const p = await api.get('/api/datacopy-progress');
+    const pct = p.pct || 0;
+    document.getElementById('dc-prog-bar').style.width     = `${pct}%`;
+    document.getElementById('dc-prog-pct').textContent     = `${pct}%`;
+    document.getElementById('dc-prog-current').textContent = p.currentFile ? p.currentFile.split('\\').pop() : '';
+    document.getElementById('dc-prog-count').textContent   = p.total ? `${p.copied||0} / ${p.total}` : '';
+    if (p.errors > 0) {
+      document.getElementById('dc-prog-errors').style.display = 'block';
+      document.getElementById('dc-prog-errors').textContent   = `⚠️ ${p.errors} error(es)`;
+    }
+    if (p.done || p.status === 'done') {
+      clearInterval(DC.copyInterval); DC.copyInterval = null;
+      toast('Copia completada', 'success');
+      dcResetCopyUI();
+      dcGoToStep(4);
+      dcRunVerification();
+    }
+  } catch(e) {}
+}
+
+async function dcCancelCopy() {
+  clearInterval(DC.copyInterval); DC.copyInterval = null;
+  await api.post('/api/datacopy-cancel', {});
+  toast('Copia cancelada', 'warn');
+  dcResetCopyUI();
+}
+
+function dcResetCopyUI() {
+  document.getElementById('dc-btn-start').style.display   = '';
+  document.getElementById('dc-btn-cancel').style.display  = 'none';
+  document.getElementById('dc-btn-back3').disabled        = false;
+}
+
+async function dcRunVerification() {
+  document.getElementById('dc-verify-loading').style.display = 'flex';
+  document.getElementById('dc-verify-result').style.display  = 'none';
+  try {
+    const r = await api.post('/api/datacopy-verify', { sources: DC.sourcesList, dest: DC.destPath });
+    document.getElementById('dc-ver-total').textContent = r.total;
+    document.getElementById('dc-ver-ok').textContent    = r.ok;
+    document.getElementById('dc-ver-fail').textContent  = r.failed;
+    const errWrap = document.getElementById('dc-verify-errors-wrap');
+    const okMsg   = document.getElementById('dc-verify-ok-msg');
+    if (r.failed > 0) {
+      errWrap.style.display = 'block'; okMsg.style.display = 'none';
+      const failed = (r.items || []).filter(i => !i.ok);
+      document.getElementById('dc-verify-errors-tbody').innerHTML = failed.map(i =>
+        `<tr><td style="font-family:var(--font-mono);font-size:.78rem">${escHtml(i.file)}</td>
+         <td style="color:var(--red)">${i.exists ? '⚠️ Tamaño diferente' : '❌ No existe'}</td></tr>`
+      ).join('');
+    } else { errWrap.style.display = 'none'; okMsg.style.display = 'block'; }
+  } catch(e) {
+    document.getElementById('dc-verify-loading').innerHTML = `<span style="color:var(--red)">Error en verificación</span>`;
+    return;
+  }
+  document.getElementById('dc-verify-loading').style.display = 'none';
+  document.getElementById('dc-verify-result').style.display  = 'block';
+}
+
+function dcReset() {
+  DC.step = 1; DC.selected.clear(); DC.destPath = ''; DC.previewData = null; DC.sourcesList = [];
+  if (DC.copyInterval) { clearInterval(DC.copyInterval); DC.copyInterval = null; }
+  document.getElementById('dc-dest-input').value = '';
+  dcRenderSelectedList();
+  dcGoToStep(1);
+}
+
+/* ══ MÓDULO IMPRESORAS ══════════════════════════════════════════ */
+let printersLoaded = false;
+let printersData   = [];
+
+async function loadPrinters() {
+  printersLoaded = false;
+  document.getElementById('printers-loading').style.display = 'flex';
+  document.getElementById('printers-content').style.display = 'none';
+  document.getElementById('printers-empty').style.display   = 'none';
+  try {
+    printersData = await api.get('/api/printers');
+    renderPrinters(printersData);
+  } catch(e) {
+    toast('Error en la operación', 'error');
+  } finally {
+    document.getElementById('printers-loading').style.display = 'none';
+    printersLoaded = true;
+  }
+}
+
+function renderPrinters(list) {
+  if (!list || list.length === 0) {
+    document.getElementById('printers-empty').style.display = 'flex';
+    return;
+  }
+  const totalJobs = list.reduce((s, p) => s + (p.JobCount || 0), 0);
+  const defPrinter = list.find(p => p.Default);
+  document.getElementById('stat-printers-count').textContent   = list.length;
+  document.getElementById('stat-printers-default').textContent = defPrinter ? defPrinter.Name : '—';
+  document.getElementById('stat-printers-jobs').textContent    = totalJobs;
+
+  const container = document.getElementById('printers-list');
+  container.innerHTML = list.map(p => {
+    const isDefault = p.Default;
+    const offline   = p.WorkOffline;
+    const statusTxt = offline ? 'Fuera de línea' : 'En línea';
+    const statusCls = offline ? 'var(--red)' : 'var(--green)';
+    return `
+    <div class="card" style="margin-bottom:14px" id="printer-card-${escAttr(p.Name)}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+            <span style="font-weight:700;font-size:1rem">${escHtml(p.Name)}</span>
+            ${isDefault ? `<span style="background:rgba(0,229,255,.15);color:var(--accent);border:1px solid var(--accent2);border-radius:3px;padding:2px 8px;font-size:.7rem;font-weight:700">✔ Predeterminada</span>` : ''}
+            ${p.Shared ? `<span style="background:rgba(168,85,247,.12);color:var(--purple);border:1px solid rgba(168,85,247,.3);border-radius:3px;padding:2px 8px;font-size:.7rem">Compartida</span>` : ''}
+            <span style="color:${statusCls};font-size:.78rem">● ${statusTxt}</span>
+          </div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:.8rem;color:var(--txt2)">
+            <span>🔌 Puerto: <span style="color:var(--txt);font-family:var(--font-mono)">${escHtml(p.PortName)}</span></span>
+            <span>🔧 Driver: <span style="color:var(--txt)">${escHtml(p.DriverName)}</span></span>
+            ${p.JobCount > 0 ? `<span style="color:var(--amber)">📄 ${p.JobCount} trabajo(s)</span>` : `<span style="color:var(--txt3)">📄 Cola vacía</span>`}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0">
+          ${!isDefault ? `<button class="btn btn-secondary btn-xs" onclick="confirmSetDefault('${escAttr(p.Name)}')">Predeterminada</button>` : ''}
+          <button class="btn btn-secondary btn-xs" onclick="togglePrinterQueue('${escAttr(p.Name)}')" id="btn-queue-${escAttr(p.Name)}">📋 Ver cola</button>
+          ${p.JobCount > 0 ? `<button class="btn btn-secondary btn-xs" onclick="confirmClearQueue('${escAttr(p.Name)}')" style="color:var(--amber)">🗑 Vaciar cola</button>` : ''}
+          <button class="btn btn-danger btn-xs" onclick="confirmDeletePrinter('${escAttr(p.Name)}')" title="Eliminar">🗑</button>
+        </div>
+      </div>
+      <div id="printer-queue-${escAttr(p.Name)}" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
+        <div class="loading-state" id="queue-loading-${escAttr(p.Name)}" style="display:none"><div class="spinner"></div></div>
+        <div id="queue-content-${escAttr(p.Name)}"></div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('printers-content').style.display = 'block';
+}
+
+async function togglePrinterQueue(printerName) {
+  const panel = document.getElementById(`printer-queue-${printerName}`);
+  const btn   = document.getElementById(`btn-queue-${printerName}`);
+  if (panel.style.display !== 'none') {
+    panel.style.display = 'none'; btn.textContent = '📋 Ver cola'; return;
+  }
+  panel.style.display = 'block'; btn.textContent = '▲ Ver cola';
+  document.getElementById(`queue-loading-${printerName}`).style.display = 'flex';
+  document.getElementById(`queue-content-${printerName}`).innerHTML = '';
+  try {
+    const jobs = await api.get(`/api/printer-jobs?printer=${encodeURIComponent(printerName)}`);
+    renderPrinterQueue(printerName, jobs);
+  } catch(e) {
+    document.getElementById(`queue-content-${printerName}`).innerHTML = `<div style="color:var(--red);font-size:.85rem">Error</div>`;
+  } finally {
+    document.getElementById(`queue-loading-${printerName}`).style.display = 'none';
+  }
+}
+
+function renderPrinterQueue(printerName, jobs) {
+  const el = document.getElementById(`queue-content-${printerName}`);
+  if (!jobs || jobs.length === 0) {
+    el.innerHTML = `<div style="color:var(--txt3);font-size:.85rem;padding:8px 0">✔ Cola vacía</div>`;
+    return;
+  }
+  el.innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>ID</th><th>Documento</th><th>Usuario</th><th>Páginas</th><th>Tamaño</th><th>Enviado</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+      ${jobs.map(j => `<tr>
+        <td style="font-family:var(--font-mono)">${j.Id}</td>
+        <td>${escHtml(j.Document||'—')}</td>
+        <td>${escHtml(j.Owner||'—')}</td>
+        <td>${j.Pages||'—'}</td>
+        <td>${escHtml(j.SizeDisp||'—')}</td>
+        <td style="font-family:var(--font-mono);font-size:.78rem">${escHtml(j.Submitted)}</td>
+        <td>${escHtml(j.Status||'—')}</td>
+        <td><button class="btn btn-danger btn-xs" onclick="confirmCancelJob('${escAttr(printerName)}',${j.Id})">Cancelar</button></td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+function confirmSetDefault(printerName) {
+  showModal({ icon:'🖨️', title:'Establecer como predeterminada', desc:`"${printerName}"`, actions: [
+    { label:'Confirmar', cls:'btn-primary', action: async () => {
+      const r = await api.post('/api/printer-set-default', { printer: printerName });
+      if (r.success) { toast('Impresora predeterminada actualizada', 'success'); loadPrinters(); }
+      else toast('Error en la operación', 'error');
+    }},
+    { label:'Cancelar', cls:'btn-secondary' }
+  ]});
+}
+
+function confirmDeletePrinter(printerName) {
+  showModal({ icon:'🗑️', title:'Eliminar impresora', desc:`Se eliminará la impresora del sistema. Los trabajos en cola se perderán.\n\n"${printerName}"`, actions: [
+    { label:'Eliminar', cls:'btn-danger', action: async () => {
+      const r = await api.post('/api/printer-delete', { printer: printerName });
+      if (r.success) { toast('Impresora eliminada', 'success'); loadPrinters(); }
+      else toast('Error en la operación', 'error');
+    }},
+    { label:'Cancelar', cls:'btn-secondary' }
+  ]});
+}
+
+function confirmClearQueue(printerName) {
+  showModal({ icon:'🗑️', title:'Vaciar cola de impresión', desc:'Se cancelarán todos los trabajos pendientes de esta impresora.', actions: [
+    { label:'Vaciar cola', cls:'btn-danger', action: async () => {
+      const r = await api.post('/api/printer-clear-queue', { printer: printerName });
+      if (r.success) { toast('Cola vaciada', 'success'); loadPrinters(); }
+      else toast('Error en la operación', 'error');
+    }},
+    { label:'Cancelar', cls:'btn-secondary' }
+  ]});
+}
+
+function confirmCancelJob(printerName, jobId) {
+  showModal({ icon:'❌', title:'Cancelar trabajo', desc:`Job ID: ${jobId}`, actions: [
+    { label:'Cancelar trabajo', cls:'btn-danger', action: async () => {
+      const r = await api.post('/api/printer-cancel-job', { printer: printerName, jobId });
+      if (r.success) {
+        toast('Trabajo cancelado', 'success');
+        const panel = document.getElementById(`printer-queue-${printerName}`);
+        panel.style.display = 'none';
+        togglePrinterQueue(printerName);
+      } else toast('Error en la operación', 'error');
+    }},
+    { label:'Cancelar', cls:'btn-secondary' }
+  ]});
+}
+
+async function openAddPrinterModal() {
+  showModal({ icon:'🖨️', title:'Añadir impresora TCP/IP', desc:'', extra: `
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
+      <div class="form-group">
+        <label class="form-label">Nombre de la impresora *</label>
+        <input type="text" class="form-input" id="add-printer-name" placeholder="Mi Impresora HP">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Dirección IP o hostname *</label>
+        <input type="text" class="form-input" id="add-printer-ip" placeholder="192.168.1.100">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Driver (nombre exacto) *</label>
+        <input type="text" class="form-input" id="add-printer-driver" placeholder="HP LaserJet M402 PCL 6">
+        <div style="font-size:.75rem;color:var(--txt2);margin-top:6px">Selecciona uno de los drivers instalados:</div>
+        <select class="form-select" id="add-printer-drivers-select" onchange="document.getElementById('add-printer-driver').value=this.value" style="margin-top:6px;font-size:.8rem">
+          <option value="">— cargando drivers... —</option>
+        </select>
+      </div>
+    </div>`, actions: [
+    { label:'Añadir impresora', cls:'btn-primary', action: async () => {
+      const name   = document.getElementById('add-printer-name').value.trim();
+      const ip     = document.getElementById('add-printer-ip').value.trim();
+      const driver = document.getElementById('add-printer-driver').value.trim();
+      if (!name || !ip || !driver) { toast('Rellena todos los campos obligatorios', 'warn'); return; }
+      const r = await api.post('/api/printer-add', { name, ip, driver });
+      if (r.success) { toast('Impresora añadida correctamente', 'success'); loadPrinters(); }
+      else toast('Error en la operación', 'error');
+    }},
+    { label:'Cancelar', cls:'btn-secondary' }
+  ]});
+  try {
+    const drivers = await api.get('/api/printer-drivers');
+    const sel = document.getElementById('add-printer-drivers-select');
+    if (sel) {
+      sel.innerHTML = '<option value="">— elige un driver —</option>' +
+        (Array.isArray(drivers) ? drivers : []).map(d => `<option value="${escAttr(d)}">${escHtml(d)}</option>`).join('');
+    }
+  } catch(e) {}
 }
 
 window.onload=()=>{ loadUsers(); };
