@@ -30,10 +30,23 @@ function Format-Bytes {
 }
 
 function Send-Response {
-    param($Context, $Data, [int]$Code = 200, [string]$ContentType = "application/json; charset=utf-8")
+    param($Context, $Data, [int]$Code = 200, [string]$ContentType = "application/json; charset=utf-8", [switch]$AsArray)
     try {
         $body = if ($ContentType -like "*/json*") {
-            ConvertTo-Json -InputObject $Data -Depth 10 -Compress
+            if ($AsArray) {
+                # Garantiza que siempre se serialice como array JSON aunque
+                # PowerShell haya desenvuelto el array a un solo elemento o null
+                if ($null -eq $Data) {
+                    '[]'
+                } elseif ($Data -is [System.Array]) {
+                    if ($Data.Count -eq 0) { '[]' }
+                    else { ConvertTo-Json -InputObject $Data -Depth 10 -Compress }
+                } else {
+                    ConvertTo-Json -InputObject @($Data) -Depth 10 -Compress
+                }
+            } else {
+                ConvertTo-Json -InputObject $Data -Depth 10 -Compress
+            }
         } else { $Data }
         $buffer = [System.Text.Encoding]::UTF8.GetBytes($body)
         $Context.Response.StatusCode = $Code
@@ -1324,7 +1337,7 @@ try {
                 }
                 # -- Modulo 1 -----------------------------------
                 "/api/users" {
-                    Send-Response $ctx (Get-SystemUsers)
+                    Send-Response $ctx (Get-SystemUsers) -AsArray
                 }
                 "/api/user-size" {
                     $user = $req.QueryString["username"]
@@ -1332,11 +1345,11 @@ try {
                 }
                 "/api/user-folders" {
                     $user = $req.QueryString["username"]
-                    Send-Response $ctx (Get-UserFolders $user)
+                    Send-Response $ctx (Get-UserFolders $user) -AsArray
                 }
                 # -- Modulo 2 -----------------------------------
                 "/api/drives" {
-                    Send-Response $ctx (Get-DriveList)
+                    Send-Response $ctx (Get-DriveList) -AsArray
                 }
                 "/api/format" {
                     $body = Read-Body $req | ConvertFrom-Json
@@ -1345,7 +1358,7 @@ try {
                 }
                 # -- Modulo 3 -----------------------------------
                 "/api/cleanup-preview" {
-                    Send-Response $ctx (Get-CleanupPreview)
+                    Send-Response $ctx (Get-CleanupPreview) -AsArray
                 }
                 "/api/cleanup" {
                     $body   = Read-Body $req | ConvertFrom-Json
@@ -1366,12 +1379,12 @@ try {
                     $t0  = [datetime]::UtcNow
                     $res = Search-Files -Drive $drive -Exts $extList -MinSize $minSize -TimeoutSec 90
                     Write-Log "scan-files: devueltos $($res.Count) en $(([datetime]::UtcNow-$t0).TotalSeconds)s"
-                    Send-Response $ctx $res
+                    Send-Response $ctx $res -AsArray
                 }
                 "/api/scan-pst" {
                     $drive = $req.QueryString["drive"]
                     if (-not $drive) { $drive = "C" }
-                    Send-Response $ctx (Search-PstFiles -Drive $drive)
+                    Send-Response $ctx (Search-PstFiles -Drive $drive) -AsArray
                 }
                 "/api/copy-pst" {
                     $body   = Read-Body $req | ConvertFrom-Json
@@ -1385,7 +1398,7 @@ try {
                 }
                 # -- Usuarios locales --
                 "/api/local-users" {
-                    Send-Response $ctx (Get-LocalUsersFull)
+                    Send-Response $ctx (Get-LocalUsersFull) -AsArray
                 }
                 "/api/local-user-create" {
                     $b = Read-Body $req | ConvertFrom-Json
@@ -1419,7 +1432,7 @@ try {
                 }
                 # -- Modulo 5 -- Red ----------------------------
                 "/api/network" {
-                    Send-Response $ctx (Get-NetworkAdapters)
+                    Send-Response $ctx (Get-NetworkAdapters) -AsArray
                 }
                 "/api/flush-dns" {
                     Send-Response $ctx (Invoke-FlushDns)
@@ -1456,7 +1469,11 @@ try {
                     $levelArr  = @($levelRaw -split ',' | Where-Object {$_ -match '^\d+$'} | ForEach-Object {[int]$_})
                     $idsArr    = @($idsRaw   -split ',' | Where-Object {$_ -match '^\d+$'} | ForEach-Object {[int]$_})
                     $result    = Get-EventLogData -LogName $logName -Level $levelArr -Days $days -MaxEvents $maxEv -Ids $idsArr -CountOnly $countOnly
-                    Send-Response $ctx $result
+                    if ($result -is [hashtable] -and $result.error) {
+                        Send-Response $ctx $result
+                    } else {
+                        Send-Response $ctx $result -AsArray
+                    }
                 }
                 # -- Modulo Copia de Datos ------------------------------
                 "/api/datacopy-preview" {
@@ -1484,7 +1501,7 @@ try {
                 }
                 # -- Modulo Servicios -----------------------------------
                 "/api/services" {
-                    Send-Response $ctx (Get-ServicesInfo)
+                    Send-Response $ctx (Get-ServicesInfo) -AsArray
                 }
                 "/api/service-start" {
                     $b = Read-Body $req | ConvertFrom-Json
@@ -1504,12 +1521,12 @@ try {
                 }
                 # -- Modulo Impresoras ----------------------------------
                 "/api/printers" {
-                    Send-Response $ctx (Get-PrintersInfo)
+                    Send-Response $ctx (Get-PrintersInfo) -AsArray
                 }
                 "/api/printer-jobs" {
                     $pn = $req.QueryString["printer"]
                     if ($pn) { $pn = [System.Uri]::UnescapeDataString($pn) }
-                    Send-Response $ctx (Get-PrinterJobsInfo -PrinterName $pn)
+                    Send-Response $ctx (Get-PrinterJobsInfo -PrinterName $pn) -AsArray
                 }
                 "/api/printer-set-default" {
                     $b = Read-Body $req | ConvertFrom-Json
@@ -1532,7 +1549,7 @@ try {
                     Send-Response $ctx (Add-PrinterTCPIPAction -PrinterName $b.name -IpAddress $b.ip -DriverName $b.driver)
                 }
                 "/api/printer-drivers" {
-                    Send-Response $ctx (Get-PrinterDriversInfo)
+                    Send-Response $ctx (Get-PrinterDriversInfo) -AsArray
                 }
                 "/api/stop" {
                     Send-Response $ctx @{ message = "Servidor detenido" }
