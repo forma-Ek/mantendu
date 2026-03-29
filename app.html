@@ -5409,8 +5409,8 @@ function dcRenderBrowserList(data) {
     const isSel   = DC.selected.has(item.FullPath);
     const sizeStr = item.type === 'file' ? `<span style="color:var(--txt3);font-size:.72rem;margin-left:auto">${item.SizeDisplay}</span>` : '';
     return `<div class="dc-browser-row ${isSel?'selected':''}">
-      <input type="checkbox" ${isSel?'checked':''} onclick="dcToggleSelect(event,'${escAttr(item.FullPath)}','${escAttr(item.Name)}','${item.type}','${escAttr(item.SizeDisplay||'')}')">
-      <span style="cursor:pointer;flex:1;display:flex;align-items:center;gap:6px" onclick="${item.type==='folder'?`dcBrowseTo('${escAttr(item.FullPath)}')`:''}">
+      <input type="checkbox" ${isSel?'checked':''} onclick="dcToggleSelect(event,'${jsStr(item.FullPath)}','${jsStr(item.Name)}','${item.type}','${jsStr(item.SizeDisplay||'')}')">
+      <span style="cursor:pointer;flex:1;display:flex;align-items:center;gap:6px" onclick="${item.type==='folder'?`dcBrowseTo('${jsStr(item.FullPath)}')`:''}">
         ${icon} <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(item.Name)}</span>
       </span>
       ${sizeStr}
@@ -5545,11 +5545,11 @@ async function dcDestBrowseTo(path) {
     // Show only folders
     const folders = (data.items || []).filter(i => i.type === 'folder');
     list.innerHTML = `
-      <div class="dc-browser-row" onclick="dcDestSelectPath('${escAttr(path)}')"
+      <div class="dc-browser-row" onclick="dcDestSelectPath('${jsStr(path)}')"
         style="color:var(--accent);font-weight:600">
         ✔ Usar esta carpeta: <span style="font-family:var(--font-mono)">${escHtml(path)}</span>
       </div>` +
-      folders.map(f => `<div class="dc-browser-row" onclick="dcDestBrowseTo('${escAttr(f.FullPath)}')">
+      folders.map(f => `<div class="dc-browser-row" onclick="dcDestBrowseTo('${jsStr(f.FullPath)}')">
         📁 ${escHtml(f.Name)}
       </div>`).join('');
   } catch(e) { list.innerHTML = '<div style="padding:12px;color:var(--red);font-size:.8rem">Sin acceso</div>'; }
@@ -6071,6 +6071,8 @@ async function openAddPrinterModal() {
 }
 
 function escAttr(s) { return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+// Escapa backslashes y comillas simples para strings JS embebidos en atributos HTML onclick
+function jsStr(s) { return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 </script>
 </body>
 </html>

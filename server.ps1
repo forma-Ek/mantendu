@@ -802,15 +802,19 @@ function Set-ServiceStartTypeAction {
 function Get-BrowsePath {
     param([string]$Path)
     if (-not $Path) { $Path = "C:\Users" }
-    $Path = $Path.TrimEnd("\")
+    # Solo quitar backslash final si NO es raíz de unidad (C:\, D:\, etc.)
+    if ($Path -notmatch '^[A-Za-z]:\\$') { $Path = $Path.TrimEnd("\") }
 
     if (-not (Test-Path $Path)) {
         return @{ error = "Ruta no encontrada: $Path" }
     }
 
-    # Parent path
-    $parent = Split-Path -Parent $Path
-    if ($parent -eq $Path) { $parent = "" }
+    # Parent path: para raíz de unidad no hay parent
+    $parent = ""
+    if ($Path -notmatch '^[A-Za-z]:\\$') {
+        $parent = Split-Path -Parent $Path
+        if (-not $parent) { $parent = "" }
+    }
 
     # List items
     $items = @()
