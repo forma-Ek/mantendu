@@ -1949,8 +1949,8 @@ td{padding:10px 14px;vertical-align:middle}
         <div class="card" style="margin-bottom:14px;padding:14px">
           <div class="ev-toolbar">
             <div style="display:flex;gap:6px;flex-wrap:wrap">
-              <button class="ev-range-btn active" data-days="1"  onclick="evSetRange(this)">24h</button>
-              <button class="ev-range-btn"        data-days="7"  onclick="evSetRange(this)">7 días</button>
+              <button class="ev-range-btn"        data-days="1"  onclick="evSetRange(this)">24h</button>
+              <button class="ev-range-btn active" data-days="7"  onclick="evSetRange(this)">7 días</button>
               <button class="ev-range-btn"        data-days="30" onclick="evSetRange(this)">30 días</button>
             </div>
             <div class="ev-level-filter" id="ev-level-filter">
@@ -5114,7 +5114,7 @@ const EV_SOURCES = {
 
 let evLoaded      = false;
 let evCurrentSrc  = 'sys-error';
-let evDays        = 1;
+let evDays        = 7;
 let evAllEvents   = [];
 let evActiveLevels = new Set(['error','warning','info']);
 let evSelectedRow = null;
