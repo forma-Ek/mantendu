@@ -33,7 +33,7 @@ function Send-Response {
     param($Context, $Data, [int]$Code = 200, [string]$ContentType = "application/json; charset=utf-8")
     try {
         $body = if ($ContentType -like "*/json*") {
-            $Data | ConvertTo-Json -Depth 10 -Compress
+            ConvertTo-Json -InputObject $Data -Depth 10 -Compress
         } else { $Data }
         $buffer = [System.Text.Encoding]::UTF8.GetBytes($body)
         $Context.Response.StatusCode = $Code
@@ -1226,9 +1226,11 @@ function Get-EventLogData {
             $filter['Id'] = $Ids
         }
 
-        $events = Get-WinEvent -FilterHashtable $filter -MaxEvents $MaxEvents `
-                               -ErrorAction SilentlyContinue |
-            ForEach-Object {
+        $rawEvents = Get-WinEvent -FilterHashtable $filter -MaxEvents $MaxEvents `
+                               -ErrorAction SilentlyContinue
+        if (-not $rawEvents) { return @() }
+
+        $events = @($rawEvents | ForEach-Object {
                 [PSCustomObject]@{
                     Id              = [int]$_.Id
                     Level           = [int]$_.Level
@@ -1239,9 +1241,9 @@ function Get-EventLogData {
                     TimeCreated     = $_.TimeCreated.ToString("dd/MM/yyyy HH:mm:ss")
                     Message         = if ($_.Message) { [string]$_.Message.Substring(0, [Math]::Min(1000, $_.Message.Length)) } else { "" }
                 }
-            }
+            })
 
-        return @($events)
+        return $events
     } catch {
         Write-Log "Get-EventLogData ERROR: $($_.Exception.Message)"
         return @{ error = $_.Exception.Message }

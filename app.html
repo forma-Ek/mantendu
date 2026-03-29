@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -3156,7 +3156,6 @@ let usersData = [];
 let openUser = null;
 
 async function loadUsers() {
-  usersLoaded = true;
   document.getElementById('users-loading').style.display = 'flex';
   document.getElementById('users-table-wrap').style.display = 'none';
   document.getElementById('users-empty').style.display = 'none';
@@ -3174,6 +3173,7 @@ async function loadUsers() {
       return;
     }
     renderUsersTable();
+    usersLoaded = true;
   } catch(e) {
     document.getElementById('users-loading').style.display = 'none';
     toast(t('toast.error') + ': ' + e.message, 'error');
@@ -5177,8 +5177,9 @@ async function evLoadSource(src) {
       ids:       (cfg.id || []).join(',')
     });
     const data = await api.get('/api/evlog?' + params, 30000);
+    if (!data) { evAllEvents = []; evFilterTable(); return; }
     if (data.error) { toast('Error: ' + data.error, 'error'); return; }
-    evAllEvents = data;
+    evAllEvents = Array.isArray(data) ? data.filter(Boolean) : [];
     evFilterTable();
     // Update count badge
     const cnt = document.getElementById('ev-cnt-' + src);
@@ -5318,9 +5319,32 @@ const DC = {
 };
 
 function initDataCopy() {
-  if (!DC.currentPath) dcBrowseTo('C:\\Users');
+  if (!DC.currentPath) dcShowSourceDrives();
   dcUpdateStepIndicator();
   if (!DC.destDrivesLoaded) dcLoadDestDrives();
+}
+
+async function dcShowSourceDrives() {
+  DC.currentPath = '';
+  document.getElementById('dc-current-path').textContent = 'Este equipo';
+  document.getElementById('dc-browser-loading').style.display = 'flex';
+  document.getElementById('dc-browser-list').innerHTML = '';
+  document.getElementById('dc-browse-up').disabled = true;
+  try {
+    const drives = await api.get('/api/drives');
+    const list = document.getElementById('dc-browser-list');
+    list.innerHTML = (drives || []).map(d =>
+      `<div class="dc-browser-row" onclick="dcBrowseTo('${escAttr(d.Letter + ':\\\\')}')">
+        <span style="font-size:1.1rem">${d.Type==='Extraible'?'🔌':'💾'}</span>
+        <span style="flex:1">${escHtml(d.Letter)}: — <span style="color:var(--txt2);font-size:.8rem">${escHtml(d.Label)} · ${d.FreeDisplay} libre de ${d.TotalDisplay}</span></span>
+      </div>`
+    ).join('') || `<div style="padding:20px;color:var(--txt3);font-size:.85rem">No se encontraron unidades</div>`;
+  } catch(e) {
+    document.getElementById('dc-browser-list').innerHTML =
+      `<div style="padding:20px;color:var(--red);font-size:.85rem">Error cargando unidades</div>`;
+  } finally {
+    document.getElementById('dc-browser-loading').style.display = 'none';
+  }
 }
 
 // ── Step indicator ──────────────────────────────────────────
@@ -5363,13 +5387,14 @@ async function dcBrowseTo(path) {
       `<div style="padding:20px;color:var(--red);font-size:.85rem">${t('explorer.noAccess')}</div>`;
   } finally {
     document.getElementById('dc-browser-loading').style.display = 'none';
-    document.getElementById('dc-browse-up').disabled = !path || path.length <= 3;
+    document.getElementById('dc-browse-up').disabled = false;
   }
 }
 
 function dcBrowseUp() {
-  if (!DC.currentPath || DC.currentPath.length <= 3) return;
-  const parent = DC.currentPath.replace(/\\[^\\]+$/, '') || DC.currentPath.slice(0, 3);
+  if (!DC.currentPath) return;
+  if (DC.currentPath.replace(/\\+$/, '').length <= 2) { dcShowSourceDrives(); return; }
+  const parent = DC.currentPath.replace(/\\[^\\]+\\?$/, '') || DC.currentPath.slice(0, 3);
   dcBrowseTo(parent);
 }
 
@@ -5464,11 +5489,10 @@ async function dcLoadDestDrives() {
     DC.destDrivesLoaded = true;
     const wrap = document.getElementById('dc-dest-drives');
     wrap.innerHTML = (drives || []).map(d => {
-      const pct = d.UsedPct || 0;
       const freeDisp = d.FreeDisplay || '—';
-      return `<div class="dc-drive-chip" onclick="dcSelectDrive('${escAttr(d.Drive)}')" id="dc-chip-${d.Drive.replace(':','')}">
-        <span style="font-size:1.2rem">${d.DriveType==='Removable'?'🔌':'💾'}</span>
-        <span>${escHtml(d.Drive)}</span>
+      return `<div class="dc-drive-chip" onclick="dcSelectDrive('${escAttr(d.Letter + ':')}')" id="dc-chip-${d.Letter}">
+        <span style="font-size:1.2rem">${d.Type==='Extraible'?'🔌':'💾'}</span>
+        <span>${escHtml(d.Letter)}:</span>
         <span class="chip-free">${freeDisp} libre</span>
       </div>`;
     }).join('');
@@ -6050,3 +6074,4 @@ function escAttr(s) { return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39
 </script>
 </body>
 </html>
+
